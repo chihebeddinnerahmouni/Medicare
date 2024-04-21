@@ -1,5 +1,5 @@
 import express from "express";
-import doctormodel from "../models/doctor-schema";
+import doctormodel, { IDoctor } from "../models/doctor-schema";
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -80,7 +80,7 @@ function authenticateToken( req: Request, res: Response, next: NextFunction ): a
   if (token == null) {
     return res.sendStatus(401); // send a 401 Unauthorized status if no token is provided
   }
-
+       
   jwt.verify(token, process.env.secret_key as string, (err: any, user: any) => {
     if (err) {
       return res.sendStatus(403); // send a 403 Forbidden status if the token is invalid
