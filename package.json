@@ -19,11 +19,18 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/mailgun-js": "^0.22.18",
+    "@types/nodemailer": "^6.4.14",
     "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "mailgun-js": "^0.22.0",
+    "mailgun.js": "^9.4.1",
     "mongodb": "^6.5.0",
-    "mongoose": "^8.3.1"
+    "mongoose": "^8.3.1",
+    "nodemailer": "^6.9.13"
   }
 }
