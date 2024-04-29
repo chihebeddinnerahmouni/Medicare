@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 //routes
-app.use('/doctors', require('./routes/routes'));
+app.use('/doctors', require('./routes/Doctors-routes'));
 
 //connect to database
 mongoose.connect(DB!).then(() => { 
