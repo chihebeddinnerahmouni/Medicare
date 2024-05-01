@@ -1,7 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
-const bcrypt = require('bcrypt');
+import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+import availableTime from "../utils/availableTime-table";
+
+
 
 // Doctor interface
 export interface IDoctor extends Document {
@@ -11,39 +15,25 @@ export interface IDoctor extends Document {
   password: string;
   email: string;
   location: string;
-  availableTime: Array<{
-    date: Date;
-    hour: Number;
-    minute: Number;
-    price: Number;
-    ticketNumber: Number;
-  }>;
+  available: availableTime[];
   verificationCode: Number | undefined;
   verified: boolean;
   generateJWT: () => Promise<string>;
 };
 
-//free time schema
-const timeSlotSchema = new Schema({
-  date: { type: Date, required: true },
-  hour: { type: Number, required: true },
-  minute: { type: Number, required: true },
-  price: { type: Number, required: true },
-  ticketNumber: { type: Number, required: true }
-});
 
 
 // Doctor schema
 const doctorschema = new Schema<IDoctor>({
-  name: { type: String, required: true, unique: true},
+  name: { type: String, required: true, unique: true },
   specialite: { type: String, required: true },
-  phone: { type: Number, required: true, unique: true},
+  phone: { type: Number, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   location: { type: String, required: true, unique: true },
-  availableTime: { type: [timeSlotSchema], default: [] },
+  available: { type: [availableTime], default: [] },
   verificationCode: { type: Number },
-  verified: { type: Boolean, default: false }
+  verified: { type: Boolean, default: false },
 });
 
 

@@ -1,6 +1,5 @@
 import { Request, Response, } from "express";
 import doctormodel from "../models/doctor-schema";
-import cryptoRandomString from "crypto-random-string";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -20,10 +19,16 @@ declare global {
 //get all doctors
 export const getAllDoctors = async (req: Request, res: Response) => {
   try {
-    const doctors = await doctormodel.find();
-    res.json(doctors)
+    try {
+      const doctors = await doctormodel
+        .find()
+        .select("name specialite phone location available");
+      res.json(doctors)
+    } catch (error) { 
+      res.status(400).send("Cannot get all doctors");
+    }
   } catch (error) {
-    res.status(400).send("Cannot get all doctors");
+    res.status(400).send("degat");
   }
 };
 
@@ -116,9 +121,20 @@ export const getDoctor = async (req: Request, res: Response) => {
   try {
     const name = req.params.name;
     const doctor = await doctormodel.findOne({ name: name });
-    res.json(doctor);
+    if (!doctor) {
+      return res.status(400).send("Cannot find doctor");
+    } else {
+      const doctorData = {
+        name: doctor!.name,
+        specialite: doctor!.specialite,
+        phone: doctor!.phone,
+        location: doctor!.location,
+        available: doctor!.available
+      };
+      res.json(doctorData);
+    }
   } catch (error) {
-    res.status(400).send("Cannot find doctor");
+    res.status(400).send("degat");
   }
 };
 
@@ -160,6 +176,7 @@ export const login = async (req: Request, res: Response) => {
     if (!validation) {
       return res.status(400).send("Invalid password");
     }
+    res.send("Logged in sahit");
   } catch (error) {
     res.status(400).send("Cannot login");
   }
