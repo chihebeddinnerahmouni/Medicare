@@ -1,5 +1,7 @@
 import { Request, Response, } from "express";
 import doctormodel from "../models/doctor-schema";
+import patientModel from "../models/patient-schema";
+import nurseModel from "../models/nurses-schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -18,15 +20,11 @@ declare global {
 
 //get all doctors
 export const getAllDoctors = async (req: Request, res: Response) => {
-  try {
     try {
       const doctors = await doctormodel
         .find()
-        .select("name specialite phone location available");
+        //.select("name specialite phone location available");
       res.json(doctors)
-    } catch (error) { 
-      res.status(400).send("Cannot get all doctors");
-    }
   } catch (error) {
     res.status(400).send("degat");
   }
@@ -47,8 +45,11 @@ export const createDoctor = async (req: Request, res: Response) => {
       email,
       location,
       availableTime,
+      type
     } = req.body;
-    if (!name || !specialite || !phone || !password || !email || !location) {
+
+    const isFieldMissing = !name || !specialite || !phone || !password || !email || !location || !type;
+    if (isFieldMissing) {
       return res.status(400).send("Please fill all fields");
     }
     //Password must contain at least one lowercase letter, one uppercase letter, one number
@@ -57,14 +58,23 @@ export const createDoctor = async (req: Request, res: Response) => {
       return res.status(401).send("Password must contain at least one lowercase letter, one uppercase letter, one number and at least 8 characters long");
     }
     //check if doctor already exists
-    const existingUser = await doctormodel.findOne({
+    const [exestingDoctor, exictingPatient, existingNurse] = await Promise.all([
+      doctormodel.findOne({ $or: [{ email }, { name }] }),
+      patientModel.findOne({ $or: [{ email }, { name }] }),
+      nurseModel.findOne({ $or: [{ email }, { name }] })
+    ]);
+    const existingUser = exestingDoctor || exictingPatient || existingNurse;
+    if (existingUser) {
+      return res.status(403).send("User already exists");
+    }
+    /*const existingUser = await doctormodel.findOne({
       $or: [{ email }, { name }],
     });
     if (existingUser) {
       return res.status(403).send("User already exists");
-    }
+    }*/
     //create new doctor
-    const newDoctor = new doctormodel({
+    const newDoctor = await doctormodel.create({
       name,
       specialite,
       phone,
@@ -72,32 +82,28 @@ export const createDoctor = async (req: Request, res: Response) => {
       email,
       location,
       availableTime,
+      type
     });
     const verificationCode = generate6Digits();
     newDoctor.verificationCode = verificationCode!;
     await newDoctor.save();
     //send email
-    const verificationLink = `localhost:5000/doctors/verify?code=${verificationCode}`;
+    const verificationLink = `localhost:3000/doctors/verify?code=${verificationCode}&type=doctor`;
     const messageData = {
       from: `hna  <mailgun@${process.env.MAILGUN_DOMAIN}>`,
       to: email,
       subject: "Account Verification",
       text: `Click the following link to verify your account: ${verificationLink}`,
     };
-    const token = jwt.sign({ id: newDoctor._id }, process.env.secret_key!);
+    //const token = newDoctor.generateJWT();
+    const token = jwt.sign({ _id: newDoctor._id }, process.env.secret_key!);
     //sending email
     await client.messages.create(DOMAIN!, messageData)
       .then((message: any) => {
         console.log("sent succes");
-        const sanitizedUser = {
-          _id: newDoctor._id,
-          email: newDoctor.email,
-          phone: newDoctor.phone,
-          verified: newDoctor.verified,
-        };
         return res.status(201).json({
-          user: sanitizedUser,
-          token,
+          user: newDoctor.name,
+          token: token,
           message:
             "Registration successful. Please check your email for verification instructions.",
         });
@@ -160,25 +166,6 @@ export const deleteDoctor = async (req: Request, res: Response) => {
     res.json({ message: "doctor deleted" });
   } catch (error) {
     res.status(400).send("Cannot delete doctor");
-  }
-}
-
-// login
-export const login = async (req: Request, res: Response) => {
-  try {
-    const docname = req.body.name;
-    const password = req.body.password;
-    const doctor = await doctormodel.findOne({ name: docname });
-    if (!doctor) {
-      return res.status(400).send("Cannot find user");
-    }
-    const validation = await bcrypt.compare(password, doctor.password);
-    if (!validation) {
-      return res.status(400).send("Invalid password");
-    }
-    res.send("Logged in sahit");
-  } catch (error) {
-    res.status(400).send("Cannot login");
   }
 }
 

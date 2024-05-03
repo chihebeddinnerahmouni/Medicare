@@ -1,7 +1,63 @@
 import doctormodel from "../models/doctor-schema";
-import e, { Request, Response, NextFunction } from "express";
+import patientModel from "../models/patient-schema";
+import nurseModel from "../models/nurses-schema";
+import { Request, Response, NextFunction } from "express";
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+    interface UserModel {
+      findOne: (arg0: { verificationCode: any }) => Promise<any>;
+    }
+
+    let model: UserModel;
+    const { type } = req.query;
+    const { code } = req.query;
+    //check the type of user
+    if (type == 'doctor') {
+        model = doctormodel;
+        //const user = 'doctor';
+    } else if (type == 'nurse') {
+        model = nurseModel;
+        //const user = 'nurse';
+    } else if (type == 'patient') {
+        model = patientModel;
+        //const user = 'patient';
+    }
+
+    //start confirmation
+    try {
+        const user = await model!.findOne({ verificationCode: code });
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+        } else if (user!.verified) {
+            res.status(400).json({ message: "User already verified" });
+        } else { 
+            user!.verified = true;
+            user!.verificationCode = undefined;
+            await user!.save();
+            res.status(200).send(`${user!.name}'s email have been verified`);
+        }
+    } catch (error) { 
+        res.status(500).json({ message: "degat", err: error });
+    }
+}
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     
     try {
         const { code } = req.query;
@@ -29,7 +85,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
         res.status(500).json({ message: "degat", err: error });
     }
 }
-
+*/
 
 
 

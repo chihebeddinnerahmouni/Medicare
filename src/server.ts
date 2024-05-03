@@ -13,6 +13,8 @@ app.use(express.urlencoded({extended: false}));
 
 //routes
 app.use('/doctors', require('./routes/Doctors-routes'));
+app.use('/patients', require('./routes/patient-routes'));
+app.use('/', require('./routes/common-routes'));
 
 //connect to database
 mongoose.connect(DB!).then(() => { 

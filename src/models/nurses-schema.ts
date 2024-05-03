@@ -1,14 +1,14 @@
-import mongoose, { Document, Schema } from "mongoose";
-import bcrypt from "bcrypt";
-import { sign } from "jsonwebtoken";
-import dotenv from "dotenv";
+import mongoose from 'mongoose';
+import { Document, Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
+import { sign } from 'jsonwebtoken';
+import dotenv from 'dotenv';
 dotenv.config();
-import availableTime from "../utils/availableTime-table";
+import availableTime from '../utils/availableTime-table';
 
 
-
-// Doctor interface
-export interface IDoctor extends Document {
+// Nurse interface
+export interface INurse extends Document {
   name: string;
   specialite: string;
   phone: Number;
@@ -20,12 +20,10 @@ export interface IDoctor extends Document {
   verified: boolean;
   generateJWT: () => Promise<string>;
   type: string;
-};
-
-
+}
 
 // Doctor schema
-const doctorschema = new Schema<IDoctor>({
+const nurseschema = new Schema<INurse>({
   name: { type: String, required: true, unique: true },
   specialite: { type: String, required: true },
   phone: { type: Number, required: true, unique: true },
@@ -38,25 +36,21 @@ const doctorschema = new Schema<IDoctor>({
   type: { type: String, required: true},
 });
 
-
 //hashing password before saving
-doctorschema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+nurseschema.pre('save', async function (next) {
+  if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
-
 //generate token
-doctorschema.methods.generateJWT = async function (): Promise<string> {
+nurseschema.methods.generateJWT = async function (): Promise<string> {
   return await sign({ name: this.name }, process.env.secret_key!);
 };
 
-
-
-
 //create a model for schema
-const doctormodel = mongoose.model<IDoctor>("doctor", doctorschema);
+const nurseModel = mongoose.model<INurse>('nurse', nurseschema);
 
-export default doctormodel;
+//export model
+export default nurseModel;
