@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import patientModel from '../models/patient-schema';
 import doctormodel from '../models/doctor-schema';
 import nurseModel from '../models/nurses-schema';
+import crypto from 'crypto';
 dotenv.config();
 /*declare global {
     namespace Express {
@@ -27,8 +28,9 @@ export const signup = async (req: Request, res: Response) => {
     } else if (type === 'nurse') {
         model = nurseModel;
     }
-    switch (type) { 
-        case 'doctor' || 'nurse':
+    switch (type) {
+        case 'doctor':
+        case 'nurse':
             try {
                 const { name, email, phone, password, specialite, location, type } = req.body;
                 const isFieldMissing = !name || !email || !phone || !password || !specialite || !location || !type;
@@ -42,27 +44,23 @@ export const signup = async (req: Request, res: Response) => {
                 }
                 //check if user already exists
                 const [exestingDoctor, exictingPatient, existingNurse] =
-                  await Promise.all([
-                    doctormodel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                    patientModel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                    nurseModel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                  ]);
+                    await Promise.all([
+                        doctormodel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                        patientModel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                        nurseModel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                    ]);
                 const existingUser = exestingDoctor || exictingPatient || existingNurse;
-                if (existingUser == exestingDoctor) {
-                    return res.status(403).send("User already exists as doctor");
-                } else if (existingUser == exictingPatient) {
-                    return res.status(403).send("User already exists as patient");
-                } else if (existingUser == existingNurse) {
-                    return res.status(403).send("User already exists as nurse");
-                }
+                if (existingUser) {
+                    res.status(403).send("User already exists");
+                } else {
 
-                //creat a new doctor or nurse
+                    //creat a new doctor or nurse
                     const user = await model!.create({
                         name,
                         email,
@@ -73,26 +71,33 @@ export const signup = async (req: Request, res: Response) => {
                         type
                     });
 
-                    const verificationCode = generate6Digits();
+                    const verificationCode = crypto.randomBytes(10).toString("hex"); 
                     user.verificationCode = verificationCode;
                     await user.save();
-                try {
-                    const verificationLink = `localhost:3000/verify/?code=${verificationCode}`;
-                    const emaildata = {
-                        from: `hna <Infos@${process.env.MAILGUN_DOMAIN}>`,
-                        to: email,
-                        subject: 'Verification Code',
-                        text: `click to confirm: ${verificationLink}`
+                    try {
+                        const verificationLink = `localhost:3000/verify/?type=${type}&code=${verificationCode}`;
+                        const emaildata = {
+                            from: `hna <Infos@${process.env.MAILGUN_DOMAIN}>`,
+                            to: email,
+                            subject: 'Verification Code',
+                            text: `click to confirm: ${verificationLink}`
+                        }
+                        await client.messages.create(process.env.MAILGUN_DOMAIN!, emaildata);
+                        res.status(200).json({ message: 'welcom, sign up succesfully and email sent' });
+                    } catch (error) {
+                        res.status(400).json({ message: 'email not sent', error: error });
                     }
-                    await client.messages.create(process.env.MAILGUN_DOMAIN!, emaildata);
-                    res.status(200).json({ message: 'welcom, sign up succesfully and email sent' });
-                }catch(error){
-                    res.status(400).json({message:'email not sent',error:error});
                 }
             } catch (error) {
                 res.status(400).json({ message: 'degat', error: error });
             }
             break;
+        
+        
+        
+        
+        
+// case patient
         case 'patient':
             try {
                 const { name, email, phone, password, type } = req.body;
@@ -107,51 +112,49 @@ export const signup = async (req: Request, res: Response) => {
                 }
                 //check if user already exists
                 const [exestingDoctor, exictingPatient, existingNurse] =
-                  await Promise.all([
-                    doctormodel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                    patientModel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                    nurseModel.findOne({
-                      $or: [{ email }, { name }, { phone }],
-                    }),
-                  ]);
+                    await Promise.all([
+                        doctormodel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                        patientModel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                        nurseModel.findOne({
+                            $or: [{ email }, { name }, { phone }],
+                        }),
+                    ]);
                 const existingUser = exestingDoctor || exictingPatient || existingNurse;
-                if (existingUser == exestingDoctor) {
-                    return res.status(403).send("User already exists as doctor");
-                } else if (existingUser == exictingPatient) {
-                    return res.status(403).send("User already exists as patient");
-                } else if (existingUser == existingNurse) {
-                    return res.status(403).send("User already exists as nurse");
-                }
-                //create a new patient
-                const user = await model!.create({
-                    name,
-                    email,
-                    phone,
-                    password,
-                    type
-                });
+                if (existingUser) {
+                    return res.status(403).send("User already exists");
+                } else {
+                    
+                    //create a new patient
+                    const user = await model!.create({
+                        name,
+                        email,
+                        phone,
+                        password,
+                        type
+                    });
 
-                const verificationCode = generate6Digits();
-                user.verificationCode = verificationCode;
-                await user.save();
-                //send email
-                try {
-                    const verificationLink = `localhost:3000/verify/?code=${verificationCode}`;
-                    const emaildata = {
-                        from: `hna <mailgun@${process.env.MAILGUN_DOMAIN}>`,
-                        to: email,
-                        subject: 'Verification Code',
-                        text: `click to confirm: ${verificationLink}`
+                    const verificationCode = crypto.randomBytes(10).toString("hex"); 
+                    user.verificationCode = verificationCode;
+                    await user.save();
+                    //send email
+                    try {
+                        const verificationLink = `localhost:3000/verify/?type=${type}&code=${verificationCode}`;
+                        const emaildata = {
+                            from: `hna <mailgun@${process.env.MAILGUN_DOMAIN}>`,
+                            to: email,
+                            subject: 'Verification Code',
+                            text: `click to confirm: ${verificationLink}`
+                        }
+                        await client.messages.create(process.env.MAILGUN_DOMAIN!, emaildata);
+                        res.status(200).json({ message: 'welcom, sign up succesfully and email sent' });
                     }
-                    await client.messages.create(process.env.MAILGUN_DOMAIN!, emaildata);
-                    res.status(200).json({ message: 'welcom, sign up succesfully and email sent' });
-                }
-                catch (error) {
-                    res.status(400).json({ message: 'email not sent', error: error });
+                    catch (error) {
+                        res.status(400).json({ message: 'email not sent', error: error });
+                    }
                 }
             } catch (error) {
                 res.status(400).json({ message: 'degat', error: error });

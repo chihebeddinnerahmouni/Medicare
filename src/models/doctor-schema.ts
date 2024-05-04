@@ -16,26 +16,28 @@ export interface IDoctor extends Document {
   email: string;
   location: string;
   available: availableTime[];
-  verificationCode: Number | undefined;
+  verificationCode: String | undefined;
   verified: boolean;
   generateJWT: () => Promise<string>;
   type: string;
+  resetPasswordCode: Number | undefined;
 };
 
 
 
 // Doctor schema
 const doctorschema = new Schema<IDoctor>({
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true, unique: true },//
   specialite: { type: String, required: true },
-  phone: { type: Number, required: true, unique: true },
+  phone: { type: Number, required: true, unique: true },//
   password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  location: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },//
+  location: { type: String, required: true},
   available: { type: [availableTime], default: [] },
-  verificationCode: { type: Number },
+  verificationCode: { type: String },
   verified: { type: Boolean, default: false },
-  type: { type: String, required: true},
+  type: { type: String, required: true },
+  resetPasswordCode: { type: Number },
 });
 
 

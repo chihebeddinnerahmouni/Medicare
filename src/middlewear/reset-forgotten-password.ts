@@ -8,10 +8,65 @@ import bcrypt from "bcrypt";
 dotenv.config();
 
 
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => { 
-  const { id, token } = req.params;
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  let code: any;
+  const { id } = req.params;
   const { password } = req.body;
+
   try {
+    const [doctor, nurse, patient] = await Promise.all([
+      doctormodel.findById({ _id: id }),
+      nurseModel.findById({ _id: id }),
+      patientModel.findById({ _id: id })
+    ]);
+    const user = doctor || nurse || patient;
+    if (!user) {
+      return res.status(404).send("User not found by id");
+    } else {
+      if (user.resetPasswordCode == code) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        user.resetPasswordCode = undefined;
+        user.save();
+        res.status(200).send("Password updated successfully");
+      } else {
+        res.status(400).send("Invalid code");
+      }
+    }
+
+  } catch (error) {
+    res.status(400).json({  message: "degat", error: error});
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*try {
     await jwt.verify(token, process.env.secret_key!, async (err: any, decoded: any) => {
       if (err) {
         res.send("Invalid or expired token");
@@ -42,34 +97,8 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
 
 
-}
-
-
-
-
-//reset password
-/*export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-
-  //getting id and token 
-  const { id, token } = req.params;
-  const { password } = req.body;
-
-  //verifying token
-  await jwt.verify(token, process.env.secret_key!, async (err: any, decoded: any) => {
-    //if token is invalid
-    if (err) {
-      console.error(err);
-      res.json({ error: err, message: "Invalid or expired token" });
-    }
-    //if token is valid
-    else {
-      console.log(decoded);
-      await bcrypt.hash(password, 10).then((hash: any) => {
-        doctormodel.findByIdAndUpdate({ _id: id }, { password: hash }, { new: true })
-          .then((u: any) => { res.json({ message: "Password updated successfully" }) })
-          .catch((err: any) => { res.json({ error: err, message: "Cannot update password" }) });
-      })
-        .catch((err: any) => { res.json({ error: err }) });
-    }
-  })
 }*/
+
+
+
+

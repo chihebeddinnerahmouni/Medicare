@@ -5,24 +5,26 @@ import dotenv from "dotenv";
 dotenv.config();
 import availableTime from "../utils/availableTime-table";
 
-interface IPatient extends Document { 
-    name: string;
-    phone: string;
-    email: string;
-    password: string;
-    verificationCode: Number;
-    verified: boolean;
-    type: string;
+interface IPatient extends Document {
+  name: string;
+  phone: string;
+  email: string;
+  password: string;
+  verificationCode: String | undefined;
+  verified: boolean;
+  type: string;
+  resetPasswordCode: Number | undefined;
 }
 
 const patientSchema = new Schema<IPatient>({
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String, required: true, unique: true},//
+    phone: { type: String, required: true, unique: true },//
+    email: { type: String, required: true, unique: true},//
     password: { type: String, required: true },
-    verificationCode: { type: Number},
+    verificationCode: { type: String},
     verified: { type: Boolean, default: false },
-    type: { type: String, required: true},
+    type: { type: String, required: true },
+    resetPasswordCode: { type: Number },
 });
 
 patientSchema.pre("save", async function (next) {

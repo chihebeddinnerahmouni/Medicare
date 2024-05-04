@@ -6,6 +6,8 @@ import doctormodel from "../models/doctor-schema";
 import nurseModel from "../models/nurses-schema";
 import patientModel from "../models/patient-schema";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { generate6Digits } from "../utils/generate-6-digits";
 dotenv.config();
 
 
@@ -30,20 +32,22 @@ export const sendResetPasswordEmail = async (req: Request, res: Response, next: 
     }
 
     const email = user.email;
-    const token = await jwt.sign({ _id: user._id! }, process.env.secret_key!);
-    const verificationLink = `localhost:3000/resetPassword/${user._id}/${token}`;
+    const code = await generate6Digits();
+    user.resetPasswordCode = code;
+    //const token = await jwt.sign({ id: user._id }, process.env.secret_key!);
+    const verificationLink = `localhost:3000/resetPassword/${code}`;
     const messageData = {
       from: `hna  <Support@${process.env.MAILGUN_DOMAIN}>`,
       to: email,
       subject: "Reset Password",
-      text: `Click the following link to reset your password: ${verificationLink}`,
+      text: `this is your code to reset password: ${verificationLink}`,
     };
 
     await client.messages.create(process.env.MAILGUN_DOMAIN!, messageData)
       .then((message: any) => {
         return res.status(201).json({
           user: user.name,
-          token: token,
+          token: code,
           message: "Email sent successfully",
         })
       }).catch((error: any) => { 
