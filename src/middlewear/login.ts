@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import nurseModel from "../models/nurses-schema";
 import patientModel from "../models/patient-schema";
 import bycrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const login = async (req: Request, res: Response) => { 
 
@@ -22,10 +23,11 @@ export const login = async (req: Request, res: Response) => {
             return res.status(400).send("User not found");
         } else { 
             const validation = await bycrypt.compare(password, user.password);
+            const token = await jwt.sign({ _id: user._id }, process.env.secret_key!);
             if (!validation) {
                 return res.status(400).send("Invalid password");
             } else {
-                res.send("Logged in sahit");
+                res.json({message: "Logged in sahit", token: token});
             }
         }
 

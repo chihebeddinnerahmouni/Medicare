@@ -95,15 +95,12 @@ export const createDoctor = async (req: Request, res: Response) => {
       subject: "Account Verification",
       text: `Click the following link to verify your account: ${verificationLink}`,
     };
-    //const token = newDoctor.generateJWT();
-    const token = jwt.sign({ _id: newDoctor._id }, process.env.secret_key!);
     //sending email
     await client.messages.create(DOMAIN!, messageData)
       .then((message: any) => {
         console.log("sent succes");
         return res.status(201).json({
           user: newDoctor.name,
-          token: token,
           message:
             "Registration successful. Please check your email for verification instructions.",
         });

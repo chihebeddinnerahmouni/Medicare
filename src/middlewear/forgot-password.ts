@@ -33,7 +33,7 @@ export const sendResetPasswordEmail = async (req: Request, res: Response, next: 
     const token = await jwt.sign({ _id: user._id! }, process.env.secret_key!);
     const verificationLink = `localhost:3000/resetPassword/${user._id}/${token}`;
     const messageData = {
-      from: `hna  <mailgun@${process.env.MAILGUN_DOMAIN}>`,
+      from: `hna  <Support@${process.env.MAILGUN_DOMAIN}>`,
       to: email,
       subject: "Reset Password",
       text: `Click the following link to reset your password: ${verificationLink}`,

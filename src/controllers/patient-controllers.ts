@@ -74,11 +74,7 @@ export const signupPatient = async (req: Request, res: Response) => {
                 text: `Verification code: ${verificationLink}`
             }
             await client.messages.create(domain!, emaildata);
-            const token = jwt.sign(
-              { name: patient.name },
-              process.env.secret_key!
-            );
-            res.status(200).json({ message: "created and email sent succesfully", token: token });
+            res.status(200).json({ message: "patient created and email sent succesfully"});
         } catch (error) {
             res.status(400).json({ message: 'verification email not send', error: error });
         }
