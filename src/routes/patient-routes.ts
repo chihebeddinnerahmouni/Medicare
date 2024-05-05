@@ -5,8 +5,6 @@ import { verifyEmail } from "../middlewear/verify-email";
 
 const router = express.Router();
 
-//verify email
-router.get("/verify", verifyEmail);
 
 //get all patients
 router.get("/", getAllPatients);

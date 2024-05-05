@@ -1,13 +1,12 @@
 import { Request, Response, } from "express";
 import doctormodel from "../models/doctor-schema";
-import patientModel from "../models/patient-schema";
-import nurseModel from "../models/nurses-schema";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import Mailgun from "mailgun.js";
-import formData from "form-data";
-import { generate6Digits } from "../utils/generate-6-digits";
+import handlePasswordStrength from "../utils/check-password";
+import isFieldMissing from "../utils/is-missing-field";
+import handleExistingUser from "../utils/check-execisting-user";
+import sendinSignupEmail from "../utils/sending-Signup-email";
+import crypto from "crypto"
 dotenv.config();
 declare global {
   namespace Express {
@@ -16,6 +15,43 @@ declare global {
     }
   }
 }
+//signup
+export const signupDoctor = async (req: Request, res: Response) => {
+  try {
+    const { name, email, phone, location, specialite, password } = req.body;
+    const fields = [name, email, phone, location, specialite, password];
+
+    if (isFieldMissing(fields)) {
+      return res.status(400).send("All fields are required");
+    }
+
+    if (!handlePasswordStrength(res, password)) {
+      return;
+    }
+
+    if (await handleExistingUser(res, email, name, phone)) {
+      return;
+    }
+
+    const verificationCode = crypto.randomBytes(10).toString("hex");
+    const type = "doctor";
+    const newdoctor = doctormodel.create({
+      name,
+      email,
+      phone,
+      location,
+      specialite,
+      password,
+      type,
+      verificationCode,
+    });
+    sendinSignupEmail(res, email, verificationCode);
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "degat mtrenjistrach marhh", error: error });
+  }
+};
 
 
 //get all doctors

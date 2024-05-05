@@ -2,13 +2,22 @@ import express from "express";
 import { sendResetPasswordEmail } from "../middlewear/forgot-password";
 import { resetPassword } from "../middlewear/reset-forgotten-password";
 import { login } from "../middlewear/login";
-import { signup } from "../middlewear/signup";
 import { verifyEmail } from "../middlewear/verify-email";
+import { signupNurse } from "../controllers/nurses-controllers";
+import { signupDoctor } from "../controllers/doctor-controllers";
+import { signupPatient } from "../controllers/patient-controllers";
+
 
 const router = express.Router();
 
-//signup
-router.post("/signup", signup);
+//signup nurse
+router.post("/signup-nurse", signupNurse);
+
+//signup doctor
+router.post("/signup-doctor", signupDoctor);
+
+//signup patient
+router.post("/signup-patient", signupPatient);
 
 //forget password
 router.post("/forgotPassword", sendResetPasswordEmail);

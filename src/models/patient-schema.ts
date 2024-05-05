@@ -7,7 +7,7 @@ import availableTime from "../utils/availableTime-table";
 
 interface IPatient extends Document {
   name: string;
-  phone: string;
+  phone: Number;
   email: string;
   password: string;
   verificationCode: String | undefined;
@@ -18,7 +18,7 @@ interface IPatient extends Document {
 
 const patientSchema = new Schema<IPatient>({
     name: { type: String, required: true, unique: true},//
-    phone: { type: String, required: true, unique: true },//
+    phone: { type: Number, required: true, unique: true },//
     email: { type: String, required: true, unique: true},//
     password: { type: String, required: true },
     verificationCode: { type: String},

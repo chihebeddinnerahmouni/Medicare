@@ -1,14 +1,12 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import patientModel from '../models/patient-schema';
-import doctormodel from '../models/doctor-schema';
-import nurseModel from '../models/nurses-schema';
 import { Request, Response, NextFunction } from 'express';
-import { generate6Digits } from '../utils/generate-6-digits';
-import bycrypt from 'bcrypt';
-import jwt, { sign } from 'jsonwebtoken';
-import Mailgun from 'mailgun.js';
-import formData from 'form-data';
+import handlePasswordStrength from "../utils/check-password";
+import isFieldMissing from "../utils/is-missing-field";
+import handleExistingUser from "../utils/check-execisting-user";
+import sendinSignupEmail from "../utils/sending-Signup-email";
+import crypto from 'crypto';
 dotenv.config();
 declare global {
     namespace Express {
@@ -18,8 +16,41 @@ declare global {
     }
 }
 
-const apikey = process.env.MAILGUN_API_KEY;
-const domain = process.env.MAILGUN_DOMAIN;
+//signup
+export const signupPatient = async (req: Request, res: Response) => {
+  try {
+    const { name, email, phone, password } = req.body;
+    const fields = [name, email, phone, password];
+    if (isFieldMissing(fields)) {
+      return res.status(400).send("All fields are required");
+    }
+
+    if (!handlePasswordStrength(res, password)) {
+      return;
+    }
+
+    if (await handleExistingUser(res, email, name, phone)) {
+      return;
+    }
+
+    const verificationCode = crypto.randomBytes(10).toString("hex");
+    const type = "patient";
+    const nurse = patientModel.create({
+      name,
+      email,
+      phone,
+      password,
+      type,
+      verificationCode,
+    });
+    sendinSignupEmail(res, email, verificationCode);
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "degat mtrenjistrach marhh", error: error });
+  }
+};
+
 
 
 // get all patients
