@@ -2,8 +2,8 @@ import express from "express";
 import {
   getAllDoctors,
   getDoctor,
-  updateDoctor,
   deleteDoctor,
+  AddAvailableTime
 } from "../controllers/doctor-controllers";
 import { authGuard } from "../middlewear/authGuard";
 
@@ -21,8 +21,8 @@ router.get("/",getAllDoctors);
 // get one doctor
 router.get("/:name", getDoctor);
 
-// update a doctor
-router.put("/:name", updateDoctor);
+//add availabletime
+router.put("/availabletime-Add", AddAvailableTime);
 
 // delete a doctor
 router.delete("/:name", deleteDoctor);

@@ -4,7 +4,10 @@ import bcrypt from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
-import availableTime from '../utils/availableTime-table';
+import {
+  AvailableTimeSchema,
+  IAvailableTime,
+} from "../utils/availableTime-table";
 
 
 // Nurse interface
@@ -15,7 +18,7 @@ export interface INurse extends Document {
   password: string;
   email: string;
   location: string;
-  available: availableTime[];
+  available: IAvailableTime[];
   verificationCode: String | undefined;
   verified: boolean;
   generateJWT: () => Promise<string>;
@@ -33,7 +36,7 @@ const nurseschema = new Schema<INurse>({
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true }, //
   location: { type: String, required: true },
-  available: { type: [availableTime], default: [] },
+  available: { type: [AvailableTimeSchema], default: [] },
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },

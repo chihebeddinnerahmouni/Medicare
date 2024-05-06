@@ -17,11 +17,12 @@ export const authGuard = async (
         return res.status(401).json({ message: "Unauthorized" });
       }
       req.user = user;
+      console.log(user);
     });
     next();
   }
   catch (error) {
-    res.status(401).json({ message: "Unauthorized" , error: error});
+    res.status(401).json({ message: "degat" , error: error});
   }
 };
   

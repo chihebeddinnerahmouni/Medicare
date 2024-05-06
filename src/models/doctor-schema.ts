@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-import availableTime from "../utils/availableTime-table";
+import { AvailableTimeSchema, IAvailableTime } from "../utils/availableTime-table";
 
 
 
@@ -15,7 +15,7 @@ export interface IDoctor extends Document {
   password: string;
   email: string;
   location: string;
-  available: availableTime[];
+  available: IAvailableTime[];
   verificationCode: String | undefined;
   verified: boolean;
   generateJWT: () => Promise<string>;
@@ -29,19 +29,19 @@ export interface IDoctor extends Document {
 
 // Doctor schema
 const doctorschema = new Schema<IDoctor>({
-  name: { type: String, required: true, unique: true },//
+  name: { type: String, required: true, unique: true }, //
   specialite: { type: String, required: true },
-  phone: { type: Number, required: true, unique: true },//
+  phone: { type: Number, required: true, unique: true }, //
   password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },//
-  location: { type: String, required: true},
-  available: { type: [availableTime], default: [] },
+  email: { type: String, required: true, unique: true }, //
+  location: { type: String, required: true },
+  available: { type: [AvailableTimeSchema], default: [] },
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
   resetPasswordCode: { type: String },
   online: { type: Boolean, default: false },
-  token: { type: String }
+  token: { type: String },
 });
 
 

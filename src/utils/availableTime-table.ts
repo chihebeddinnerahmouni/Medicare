@@ -1,18 +1,21 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const availableTime = new Schema({
-  date: { type: Date, required: true },
-  hour: { type: Number, required: true },
-  minute: { type: Number, required: true },
-  price: { type: Number, required: true },
+export const AvailableTimeSchema = new Schema({
+  day: { type: String, required: true },
+  hour: { type: String, required: true },
   ticketNumber: { type: Number, required: true },
 });
 
-type availableTime = {
-  date: Date;
-  hour: number;
-  minute: number;
-  price: number;
+export interface IAvailableTime extends Document {
+  day: String;
+  hour: String;
   ticketNumber: number;
-};
-export default availableTime;
+}
+
+const AvailableTime = mongoose.model<IAvailableTime>(
+  "AvailableTime",
+  AvailableTimeSchema
+);
+
+export default AvailableTime;
+
