@@ -23,7 +23,7 @@ router.post("/signup-patient", signupPatient);
 router.post("/forgotPassword", sendResetPasswordEmail);
 
 //reset password
-router.post("/resetPassword/:id/:token", resetPassword);
+router.post("/resetPassword", resetPassword);
 
 //login
 router.post("/login", login);

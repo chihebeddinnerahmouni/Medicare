@@ -43,7 +43,7 @@ export const signupPatient = async (req: Request, res: Response) => {
       type,
       verificationCode,
     });
-    sendinSignupEmail(res, email, verificationCode);
+    sendinSignupEmail(res, email, type, name);
   } catch (error) {
     res
       .status(400)

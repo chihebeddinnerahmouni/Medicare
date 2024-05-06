@@ -13,18 +13,22 @@ interface IPatient extends Document {
   verificationCode: String | undefined;
   verified: boolean;
   type: string;
-  resetPasswordCode: Number | undefined;
+  resetPasswordCode: Number | String | undefined;
+  online: { type: Boolean; default: false };
+  token: string;
 }
 
 const patientSchema = new Schema<IPatient>({
-    name: { type: String, required: true, unique: true},//
-    phone: { type: Number, required: true, unique: true },//
-    email: { type: String, required: true, unique: true},//
-    password: { type: String, required: true },
-    verificationCode: { type: String},
-    verified: { type: Boolean, default: false },
-    type: { type: String, required: true },
-    resetPasswordCode: { type: Number },
+  name: { type: String, required: true, unique: true }, //
+  phone: { type: Number, required: true, unique: true }, //
+  email: { type: String, required: true, unique: true }, //
+  password: { type: String, required: true },
+  verificationCode: { type: String },
+  verified: { type: Boolean, default: false },
+  type: { type: String, required: true },
+  resetPasswordCode: { type: String },
+  online: { type: Boolean, default: false },
+  token: { type: String },
 });
 
 patientSchema.pre("save", async function (next) {

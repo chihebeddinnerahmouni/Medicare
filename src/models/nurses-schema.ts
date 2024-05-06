@@ -20,22 +20,25 @@ export interface INurse extends Document {
   verified: boolean;
   generateJWT: () => Promise<string>;
   type: string;
-  resetPasswordCode: Number | undefined;
+  resetPasswordCode: Number | String | undefined;
+  online: { type: Boolean; default: false };
+  token: string;
 }
 
 // Doctor schema
 const nurseschema = new Schema<INurse>({
-  name: { type: String, required: true, unique: true },//
+  name: { type: String, required: true, unique: true }, //
   specialite: { type: String, required: true },
-  phone: { type: Number, required: true, unique: true },//
+  phone: { type: Number, required: true, unique: true }, //
   password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },//
+  email: { type: String, required: true, unique: true }, //
   location: { type: String, required: true },
   available: { type: [availableTime], default: [] },
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  resetPasswordCode: { type: Number },
+  resetPasswordCode: { type: String },
+  token: { type: String },
 });
 
 //hashing password before saving
@@ -46,10 +49,6 @@ nurseschema.pre('save', async function (next) {
   next();
 });
 
-//generate token
-nurseschema.methods.generateJWT = async function (): Promise<string> {
-  return await sign({ name: this.name }, process.env.secret_key!);
-};
 
 //create a model for schema
 const nurseModel = mongoose.model<INurse>('nurse', nurseschema);

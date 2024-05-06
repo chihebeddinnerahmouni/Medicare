@@ -45,7 +45,7 @@ export const signupDoctor = async (req: Request, res: Response) => {
       type,
       verificationCode,
     });
-    sendinSignupEmail(res, email, verificationCode);
+    sendinSignupEmail(res, email, type, name);
   } catch (error) {
     res
       .status(400)
@@ -134,5 +134,7 @@ export const authenticateToken = (req: Request, res: Response, next: any) => {
     next();
   });
 }
+
+
 
 

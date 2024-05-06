@@ -20,7 +20,9 @@ export interface IDoctor extends Document {
   verified: boolean;
   generateJWT: () => Promise<string>;
   type: string;
-  resetPasswordCode: Number | undefined;
+  resetPasswordCode: Number | String | undefined;
+  online: Boolean;
+  token: string;
 };
 
 
@@ -37,7 +39,9 @@ const doctorschema = new Schema<IDoctor>({
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  resetPasswordCode: { type: Number },
+  resetPasswordCode: { type: String },
+  online: { type: Boolean, default: false },
+  token: { type: String }
 });
 
 
@@ -49,11 +53,6 @@ doctorschema.pre("save", async function (next) {
   next();
 });
 
-
-//generate token
-doctorschema.methods.generateJWT = async function (): Promise<string> {
-  return await sign({ name: this.name }, process.env.secret_key!);
-};
 
 
 

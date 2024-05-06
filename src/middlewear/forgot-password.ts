@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import doctormodel from "../models/doctor-schema";
 import nurseModel from "../models/nurses-schema";
 import patientModel from "../models/patient-schema";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { generate6Digits } from "../utils/generate-6-digits";
 dotenv.config();
@@ -31,28 +30,32 @@ export const sendResetPasswordEmail = async (req: Request, res: Response, next: 
       return res.status(404).send("User not found");
     }
 
-    const email = user.email;
-    const code = await generate6Digits();
-    user.resetPasswordCode = code;
-    //const token = await jwt.sign({ id: user._id }, process.env.secret_key!);
-    const verificationLink = `localhost:3000/resetPassword/${code}`;
-    const messageData = {
-      from: `hna  <Support@${process.env.MAILGUN_DOMAIN}>`,
-      to: email,
-      subject: "Reset Password",
-      text: `this is your code to reset password: ${verificationLink}`,
-    };
-
-    await client.messages.create(process.env.MAILGUN_DOMAIN!, messageData)
-      .then((message: any) => {
-        return res.status(201).json({
-          user: user.name,
-          token: code,
-          message: "Email sent successfully",
-        })
-      }).catch((error: any) => { 
-        return res.status(400).send("Cannot send email");
-      });
+    if (!user.resetPasswordCode) {
+      const email = user.email;
+      const code = await crypto.randomBytes(10).toString("hex");
+      user.resetPasswordCode = code;
+      await user.save();
+      //const token = await jwt.sign({ id: user._id }, process.env.secret_key!);
+      const verificationLink = `localhost:3000/resetPassword?code=${code}&name=${name}`;
+      const messageData = {
+        from: `hna  <Support@${process.env.MAILGUN_DOMAIN}>`,
+        to: email,
+        subject: "Reset Password",
+        text: `click here toreset password: ${verificationLink}`,
+      };
+      await client.messages.create(process.env.MAILGUN_DOMAIN!, messageData)
+        .then((message: any) => {
+          return res.status(201).json({
+            user: user.name,
+            token: code,
+            message: "Email sent successfully",
+          })
+        }).catch((error: any) => {
+          return res.status(400).send("Cannot send email");
+        });
+    } else { 
+      return res.status(400).send("is not asking for a new password");
+    }
        
 
 

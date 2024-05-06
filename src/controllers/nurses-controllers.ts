@@ -43,7 +43,7 @@ export const signupNurse = async (req: Request, res: Response) => {
             verificationCode,
         });
 
-        sendinSignupEmail(res, email, verificationCode);
+        sendinSignupEmail(res, email, type, name);
     } catch (error) {
         res.status(400).json({ message: "degat mtrenjistrach marhh", error: error });
     }

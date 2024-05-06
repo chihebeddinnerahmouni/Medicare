@@ -5,27 +5,23 @@ import { Request, Response, NextFunction } from "express";
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     interface UserModel {
-      findOne: (arg0: { verificationCode: any }) => Promise<any>;
+      findOne: (arg0: { name: any }) => Promise<any>;
     }
 
     let model: UserModel;
-    const { type } = req.query;
-    const { code } = req.query;
+    const { type, name } = req.query;
     //check the type of user
     if (type == 'doctor') {
         model = doctormodel;
-        //const user = 'doctor';
     } else if (type == 'nurse') {
         model = nurseModel;
-        //const user = 'nurse';
     } else if (type == 'patient') {
         model = patientModel;
-        //const user = 'patient';
     }
 
     //start confirmation
     try {
-        const user = await model!.findOne({ verificationCode: code });
+        const user = await model!.findOne({ name });
         if (!user) {
             res.status(404).json({ message: "User not found" });
         } else if (user!.verified) {
