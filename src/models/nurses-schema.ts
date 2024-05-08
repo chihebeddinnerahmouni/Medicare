@@ -23,9 +23,10 @@ export interface INurse extends Document {
   verified: boolean;
   generateJWT: () => Promise<string>;
   type: string;
-  resetPasswordCode: Number | String | undefined;
-  online: { type: Boolean; default: false };
+  demandingNewPassword: Boolean;
+  online: Boolean;
   token: string;
+  tokenVersion: number;
 }
 
 // Doctor schema
@@ -40,8 +41,10 @@ const nurseschema = new Schema<INurse>({
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  resetPasswordCode: { type: String },
+  demandingNewPassword: { type: String, default: false},
+  online: { type: Boolean, default: false },
   token: { type: String },
+  tokenVersion: { type: Number, default: 0 },
 });
 
 //hashing password before saving

@@ -1,9 +1,10 @@
 import express from 'express';
 import {
-  signupNurse,
   getAllNurses,
   deleteNurse,
+  getNurseProfile
 } from "../controllers/nurses-controllers";
+import { authGuard } from "../middlewear/authGuard";
 
 
 const router = express.Router();
@@ -13,6 +14,9 @@ router.get("/", getAllNurses);
 
 //delete a nurse
 router.delete("/delete/:name", deleteNurse);
+
+//nurse profile
+router.get("/profile", authGuard, getNurseProfile);
 
 
 

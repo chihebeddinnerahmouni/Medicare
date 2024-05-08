@@ -13,9 +13,10 @@ interface IPatient extends Document {
   verificationCode: String | undefined;
   verified: boolean;
   type: string;
-  resetPasswordCode: Number | String | undefined;
-  online: { type: Boolean; default: false };
+  demandingNewPassword: Boolean;
+  online: Boolean;
   token: string;
+  tokenVersion: number;
 }
 
 const patientSchema = new Schema<IPatient>({
@@ -26,9 +27,10 @@ const patientSchema = new Schema<IPatient>({
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  resetPasswordCode: { type: String },
+  demandingNewPassword: { type: String, default: false},
   online: { type: Boolean, default: false },
   token: { type: String },
+  tokenVersion: { type: Number, default: 0 },
 });
 
 patientSchema.pre("save", async function (next) {

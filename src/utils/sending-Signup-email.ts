@@ -1,6 +1,7 @@
 import { Response } from "express";
 import FormData from "form-data";
 import Mailgun from "mailgun.js";
+import jwt from "jsonwebtoken";
 
 const sendinSignupEmail = async (
   res: Response,
@@ -14,7 +15,8 @@ const sendinSignupEmail = async (
     key: process.env.MAILGUN_API_KEY!,
   });
   try {
-    const verificationLink = `localhost:3000/verify?name=${name}&type=${type}`;
+    const token = jwt.sign({ name: name, type: type }, process.env.secret_key as string);
+    const verificationLink = `localhost:3000/verify?code=${token}`;
     const data = {
       from: "hna <infos@medicares.me>",
       to: email,

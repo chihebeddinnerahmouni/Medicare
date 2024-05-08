@@ -1,6 +1,6 @@
 import express from "express";
-import { getAllPatients, deletePatient } from "../controllers/patient-controllers";
-import { verifyEmail } from "../middlewear/verify-email";
+import { getAllPatients, deletePatient, getPatientProfile } from "../controllers/patient-controllers";
+import { authGuard } from "../middlewear/authGuard";
 
 
 const router = express.Router();
@@ -11,6 +11,9 @@ router.get("/", getAllPatients);
 
 //delete a patient
 router.delete("/:name", deletePatient);
+
+//patient profile
+router.get("/profile", authGuard, getPatientProfile);
 
 
 

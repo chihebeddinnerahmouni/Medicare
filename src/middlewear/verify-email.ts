@@ -2,41 +2,53 @@ import doctormodel from "../models/doctor-schema";
 import patientModel from "../models/patient-schema";
 import nurseModel from "../models/nurses-schema";
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+
+
+
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     interface UserModel {
-      findOne: (arg0: { name: any }) => Promise<any>;
+        findOne: (arg0: { name: any }) => Promise<any>;
     }
 
     let model: UserModel;
-    const { type, name } = req.query;
-    //check the type of user
-    if (type == 'doctor') {
-        model = doctormodel;
-    } else if (type == 'nurse') {
-        model = nurseModel;
-    } else if (type == 'patient') {
-        model = patientModel;
-    }
-
-    //start confirmation
-    try {
-        const user = await model!.findOne({ name });
-        if (!user) {
-            res.status(404).json({ message: "User not found" });
-        } else if (user!.verified) {
-            res.status(400).json({ message: "User already verified" });
-        } else { 
-            user!.verified = true;
-            user!.verificationCode = undefined;
-            await user!.save();
-            res.status(200).send(`${user!.name}'s email have been verified`);
+    const code = req.query.code;
+    jwt.verify(code as string, process.env.secret_key!, async (err: any, decoded: any) => {
+        if (err) {
+            return res.status(401).json({ message: "Unauthorized" });
         }
-    } catch (error) { 
-        res.status(500).json({ message: "degat", err: error });
-    }
+        const type = decoded!.type;
+        const name = decoded!.name;
+        //check the type of user
+        if (type == 'doctor') {
+            model = doctormodel;
+        } else if (type == 'nurse') {
+            model = nurseModel;
+        } else if (type == 'patient') {
+            model = patientModel;
+        }
+
+        //start confirmation
+        try {
+            const user = await model!.findOne({ name });
+            if (!user) return res.status(404).json({ message: "User not found" });
+            
+            if (user!.verified) return res.status(400).json({ message: "User already verified" });
+            
+                user!.verified = true;
+                user!.verificationCode = undefined;
+                await user!.save();
+                res.status(200).send(`${user!.name}'s email have been verified`);
+            
+        } catch (error) {
+            res.status(500).json({ message: "degat", err: error });
+        }
+    });
 }
-    
+
 
 
 

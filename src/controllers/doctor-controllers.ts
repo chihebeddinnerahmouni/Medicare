@@ -76,27 +76,6 @@ export const getAllDoctors = async (req: Request, res: Response) => {
 
 
 
-// get one doctor
-export const getDoctor = async (req: Request, res: Response) => {
-  try {
-    const name = req.params.name;
-    const doctor = await doctormodel.findOne({ name: name });
-    if (!doctor) {
-      return res.status(400).send("Cannot find doctor");
-    } else {
-      const doctorData = {
-        name: doctor!.name,
-        specialite: doctor!.specialite,
-        phone: doctor!.phone,
-        location: doctor!.location,
-        available: doctor!.available
-      };
-      res.json(doctorData);
-    }
-  } catch (error) {
-    res.status(400).send("degat");
-  }
-};
 
 
 
@@ -142,9 +121,6 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
       }
 
     });
-
-
-
   } catch(err) {
     res.send("error"+ err)
   }
@@ -152,39 +128,33 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
 
 
 
-
-
-
-
-
-
-
-  /*try {
-    const { name } = req.query;
-    const { day, hour, ticketNumber } = req.body;
-    const doctor = await doctormodel.findOne({ name: name });
-    if (!doctor) {
-      return res.status(400).send("Cannot find doctor");
-    } else {
-      const availableTime = new AvailableTime({
-        day,
-        hour,
-        ticketNumber,
-      });
-      await availableTime.save();
-      doctor!.available.push(availableTime);
-      await doctor!.save();
-      console.log(doctor);
-      console.log(availableTime);
-      res.json({
-        message: "Available time added",
-        doctor: doctor,
-      });
-    }
-  } catch (error) {
-    res.status(400).send("Cannot add available time");
+//get profile
+export const getDoctorProfile = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const doctor = await doctormodel.findById(id);
+    if (!doctor) return res.status(345).send("Cannot find doctor profile");
+    const resDoctor = {
+      name: doctor.name,
+      email: doctor.email,
+      phone: doctor.phone,
+      location: doctor.location,
+      specialite: doctor.specialite,
+    };
+    res.json(resDoctor);
+  } catch (error) { 
+    res.send("error degat"+ error)
   }
-*/
+};
+
+
+
+
+
+
+
+
+
 
 
 

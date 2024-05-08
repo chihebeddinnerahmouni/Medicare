@@ -69,3 +69,23 @@ export const deleteNurse = async (req: Request, res: Response) => {
         res.status(400).json({ message: "Error deleting nurse", error: error });
     }
 };
+
+
+//get profile
+export const getNurseProfile = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse profile");
+      const resUser = {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        location: user.location,
+        specialite: user.specialite
+      }
+    res.json(resUser);
+  } catch (error) { 
+    res.send("error degat"+ error)
+  }
+};
