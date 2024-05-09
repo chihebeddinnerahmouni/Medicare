@@ -24,7 +24,7 @@ const sendinSignupEmail = async (
       text: `Your verification link is ${verificationLink}`,
     };
     await client.messages.create(process.env.MAILGUN_DOMAIN!, data);
-    res.status(200).json({ message: "Email sent successfully" });
+    res.status(200).json({ message: "Email sent successfully please check it" });
   } catch (error) {
     res.status(400).json({ message: "Error sending email", error: error });
   }

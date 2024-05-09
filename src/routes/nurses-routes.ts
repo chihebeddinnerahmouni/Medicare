@@ -3,7 +3,9 @@ import {
   getAllNurses,
   deleteNurse,
   getNurseProfile,
-  updatePassword
+  updatePassword,
+  updateNurseProfile,
+  updateNurseEmail
 } from "../controllers/nurses-controllers";
 import  authGuard  from "../middlewear/authGuard";
 
@@ -20,7 +22,13 @@ router.delete("/delete/:name", deleteNurse);
 router.get("/profile", authGuard, getNurseProfile);
 
 //update password
-router.put("/update-password", authGuard, updatePassword);
+router.put("/profile/update-password", authGuard, updatePassword);
+
+//update profile
+router.put("/profile/update-profile", authGuard, updateNurseProfile);
+
+//update email
+router.put("/profile/update-email", authGuard, updateNurseEmail);
 
 
 

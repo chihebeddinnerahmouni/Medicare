@@ -12,7 +12,7 @@ export const logout = async (req: Request, res: Response) => {
         if (user.online === true) {
             user.tokenVersion += 1;
             user.token = "";
-            //user.refreshToken = "";
+            user.refreshToken = "";
             user.online = false;
             await user.save();
             res.send(`${user.name} logged out`);

@@ -2,10 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import nurseModel from "../models/nurses-schema";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import handlePasswordStrength from "../utils/check-password";
+import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
-import handleExistingUser from "../utils/check-execisting-user";
+import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
+import findByEmail from "../utils/find-by-email";
+import multer, { StorageEngine } from "multer";
 dotenv.config();
 
 
@@ -16,7 +18,8 @@ dotenv.config();
 export const signupNurse = async (req: Request, res: Response) => {
     try {
         const { name, email, phone, location, specialite, password } = req.body;
-        const fields = [name, email, phone, location, specialite, password];
+      const fields = [name, email, phone, location, specialite, password];
+              const type = "nurse";
 
         if (isFieldMissing(fields)) {
             return res.status(400).send("All fields are required");
@@ -31,7 +34,6 @@ export const signupNurse = async (req: Request, res: Response) => {
         }
 
         const verificationCode = crypto.randomBytes(10).toString("hex");
-        const type = "nurse";
         const nurse = nurseModel.create({
             name,
             email,
@@ -107,3 +109,52 @@ export const updatePassword = async (req: Request, res: Response) => {
     res.send("error degat"+ error)
   }
 };
+
+
+
+//update profile
+export const updateNurseProfile = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const { name, email, phone, location, specialite } = req.body;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse to update profile");
+
+    if (await handleExistingUser(res, email, name, phone)) return;
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (location) user.location = location;
+    if (specialite) user.specialite = specialite;
+    await user.save();
+    res.json({ message: "Profile updated" });
+  } catch (err) {
+    res.send("error" + err);
+  }
+};
+
+
+
+//update email
+export const updateNurseEmail = async (req: Request, res: Response) => { 
+
+  try {
+    const id = req.user.id;
+    const { email, phone, name } = req.body;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse to update email");
+
+    const exdoctorexuser = await nurseModel.findOne({ email });
+    if(await findByEmail(res, email)) return;
+    //if (await handleExistingUser(res, email, name, phone)) return;
+
+    await sendinSignupEmail(res, email, user.type, user.name);
+    
+    user.verified = false;
+    user.email = email;
+    await user.save();
+  } catch (err) {
+    res.send("error" + err);
+  }
+}

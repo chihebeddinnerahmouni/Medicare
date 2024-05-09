@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import doctormodel from "../models/doctor-schema";
 import nurseModel from "../models/nurses-schema";
 import patientModel from "../models/patient-schema";
-import handlePasswordStrength from "../utils/check-password";
+import handlePasswordStrength from "../utils/check-password-strength";
 import jwt from "jsonwebtoken";
 import definingModel from "../utils/defining-model";
 dotenv.config();
