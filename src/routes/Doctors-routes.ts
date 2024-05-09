@@ -39,8 +39,7 @@ router.put("/profile/update-profile", authGuard, updateDoctorProfile);
 //update email
 router.put("/profile/update-email", authGuard, updateDoctorEmail);
 
-//update profile picture
-//router.put("/profile/update-profile-picture", authGuard, updateDoctorProfilePicture);
+
 
 
 

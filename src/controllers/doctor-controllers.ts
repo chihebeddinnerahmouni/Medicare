@@ -157,23 +157,39 @@ export const updatePassword = async (req: Request, res: Response) => {
 export const updateDoctorProfile = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
-    const { name, email, phone, location, specialite } = req.body;
+    const field = req.body;
+    const { email } = req.body;
+    let name: any;
+    let phone: any;
     const user = await doctormodel.findById(id);
     if (!user) return res.status(400).send("Cannot find doctor to update profile");
 
-    if(await handleExistingUser(res, email, name, phone)) return;
+    if (await handleExistingUser(res, email, name, phone)) return;
+    
+    updateUserFields(user, field);
 
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (phone) user.phone = phone;
-    if (location) user.location = location;
-    if (specialite) user.specialite = specialite;
+
     await user.save();
     res.json({ message: "Profile updated" });
   } catch (err) {
     res.send("error" + err);
   }
 };
+const updateUserFields = (user: any, fields: any) => { // teb3a l update profile
+  const { name, email, phone, location, specialite } = fields;
+  if (name) user.name = name;
+  if (email) user.email = email;
+  if (phone) user.phone = phone;
+  if (location) user.location = location;
+  if (specialite) user.specialite = specialite;
+};
+
+
+
+
+
+
+
 
 
 
