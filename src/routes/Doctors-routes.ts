@@ -4,8 +4,9 @@ import {
   deleteDoctor,
   AddAvailableTime,
   getDoctorProfile,
+  updatePassword
 } from "../controllers/doctor-controllers";
-import { authGuard } from "../middlewear/authGuard";
+import  authGuard  from "../middlewear/authGuard";
 
 
 
@@ -26,6 +27,9 @@ router.delete("/:name", deleteDoctor);
 
 //doctor profile
 router.get("/profile", authGuard, getDoctorProfile);
+
+//update password
+router.put("/update-password", authGuard, updatePassword);
 
 
 

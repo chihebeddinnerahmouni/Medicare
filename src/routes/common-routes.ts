@@ -6,7 +6,7 @@ import { verifyEmail } from "../middlewear/verify-email";
 import { signupNurse } from "../controllers/nurses-controllers";
 import { signupDoctor } from "../controllers/doctor-controllers";
 import { signupPatient } from "../controllers/patient-controllers";
-import { authGuard } from "../middlewear/authGuard";
+import  authGuard  from "../middlewear/authGuard";
 import { logout } from "../middlewear/log-out";
 
 

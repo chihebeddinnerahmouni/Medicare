@@ -89,3 +89,21 @@ export const getNurseProfile = async (req: Request, res: Response) => {
     res.send("error degat"+ error)
   }
 };
+
+
+
+//update password
+export const updatePassword = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const { password } = req.body;
+    if (!handlePasswordStrength(res, password)) return;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse to reset password");
+    user.password = password;
+    await user.save();
+    res.json({ message: "Password updated" });
+  } catch (error) {
+    res.send("error degat"+ error)
+  }
+};

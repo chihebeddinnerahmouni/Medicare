@@ -23,6 +23,7 @@ export interface IDoctor extends Document {
   demandingNewPassword: Boolean;
   online: Boolean;
   token: string;
+  refreshToken: string;
   tokenVersion: number;
 };
 
@@ -43,6 +44,7 @@ const doctorschema = new Schema<IDoctor>({
   demandingNewPassword: { type: Boolean, default: false},
   online: { type: Boolean, default: false },
   token: { type: String },
+  refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
 });
 

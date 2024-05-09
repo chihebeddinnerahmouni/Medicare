@@ -1,9 +1,4 @@
-import { verify } from "jsonwebtoken";
-import doctormodel from "../models/doctor-schema";
-import nurseModel from "../models/nurses-schema";
-import patientModel from "../models/patient-schema";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import definingModel from "../utils/defining-model";
 
 export const logout = async (req: Request, res: Response) => {
@@ -15,14 +10,12 @@ export const logout = async (req: Request, res: Response) => {
             return res.status(404).send("User not found mlginahch");
         }
         if (user.online === true) {
-            if (user.tokenVersion !== tokenVersion) {
-                return res.send("token version not matched");
-            }
             user.tokenVersion += 1;
-            user.tokens = "";
+            user.token = "";
+            //user.refreshToken = "";
             user.online = false;
             await user.save();
-            res.send("logged out");
+            res.send(`${user.name} logged out`);
                           
         } else {
             res.send("user is not online");

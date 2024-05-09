@@ -1,6 +1,6 @@
 import express from "express";
-import { getAllPatients, deletePatient, getPatientProfile } from "../controllers/patient-controllers";
-import { authGuard } from "../middlewear/authGuard";
+import { getAllPatients, deletePatient, getPatientProfile, updatePassword } from "../controllers/patient-controllers";
+import  authGuard  from "../middlewear/authGuard";
 
 
 const router = express.Router();
@@ -14,6 +14,9 @@ router.delete("/:name", deletePatient);
 
 //patient profile
 router.get("/profile", authGuard, getPatientProfile);
+
+//update password
+router.put("/update-password", authGuard, updatePassword);
 
 
 

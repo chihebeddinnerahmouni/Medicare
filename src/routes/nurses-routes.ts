@@ -2,9 +2,10 @@ import express from 'express';
 import {
   getAllNurses,
   deleteNurse,
-  getNurseProfile
+  getNurseProfile,
+  updatePassword
 } from "../controllers/nurses-controllers";
-import { authGuard } from "../middlewear/authGuard";
+import  authGuard  from "../middlewear/authGuard";
 
 
 const router = express.Router();
@@ -17,6 +18,9 @@ router.delete("/delete/:name", deleteNurse);
 
 //nurse profile
 router.get("/profile", authGuard, getNurseProfile);
+
+//update password
+router.put("/update-password", authGuard, updatePassword);
 
 
 

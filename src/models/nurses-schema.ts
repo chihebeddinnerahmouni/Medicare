@@ -26,6 +26,7 @@ export interface INurse extends Document {
   demandingNewPassword: Boolean;
   online: Boolean;
   token: string;
+  refreshToken: string;
   tokenVersion: number;
 }
 
@@ -44,6 +45,7 @@ const nurseschema = new Schema<INurse>({
   demandingNewPassword: { type: String, default: false},
   online: { type: Boolean, default: false },
   token: { type: String },
+  refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
 });
 

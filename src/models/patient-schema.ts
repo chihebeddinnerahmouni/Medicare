@@ -16,6 +16,7 @@ interface IPatient extends Document {
   demandingNewPassword: Boolean;
   online: Boolean;
   token: string;
+  refreshToken: string;
   tokenVersion: number;
 }
 
@@ -30,6 +31,7 @@ const patientSchema = new Schema<IPatient>({
   demandingNewPassword: { type: String, default: false},
   online: { type: Boolean, default: false },
   token: { type: String },
+  refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
 });
 

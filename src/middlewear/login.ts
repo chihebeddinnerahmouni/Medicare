@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import isFieldMissing from "../utils/is-missing-field";
 
 export const login = async (req: Request, res: Response) => {
-    const { name, password, reemberMe } = req.body;
+    const { name, password, rememberMe } = req.body;
     const fields = [name, password];
     
     if (isFieldMissing(fields)) {
@@ -21,17 +21,26 @@ export const login = async (req: Request, res: Response) => {
         //if (!user.verified) return res.status(400).send(`${user.name}'s email not verified, verify`);
         
         const validation = await validatePassword(password, user.password);
-        if (!validation) {
-            return res.status(400).send("Invalid password");
-        } else {
-            const token = await generateToken(user, reemberMe);
+        if (!validation) return res.status(400).send("Invalid password");
+         
+        if (user.online) return res.status(400).send("User already logged in");
+
+        const token = await generateToken(user, rememberMe);
+        //const refreshToken = await generateRefreshToken(user);
             await updateUser(user, token);
             res.json({ message: "Logged in successfully", token: token });
-        }
+        
     } catch (error) {
         res.status(400).send("Error: " + error);
     }
-};
+}
+
+
+
+
+
+
+
 
 async function findUser(name: string) {
     const [doctor, patient, nurse] = await Promise.all([
@@ -47,16 +56,27 @@ async function validatePassword(password: string, hashedPassword: string) {
 }
 
 async function generateToken(user: any, rememberMe: boolean) {
-    const expiresIn = rememberMe ? "7d" : "1d";
-    return await jwt.sign(
-        {
-            id: user._id,
-            type: user.type,
-            tokenVersion: user.tokenVersion,
-        },
-        process.env.secret_key!,
-        { expiresIn }
-    );
+  const expiresIn = rememberMe ? "7d" : "1d";
+  return await jwt.sign(
+    {
+      id: user._id,
+      type: user.type,
+      tokenVersion: user.tokenVersion,
+    },
+    process.env.secret_key!,
+    { expiresIn }
+  );
+}
+async function generateRefreshToken(user: any) {
+  return await jwt.sign(
+    {
+      id: user._id,
+      type: user.type,
+      tokenVersion: user.tokenVersion,
+    },
+    process.env.refresh_secret_key!,
+    { expiresIn: "7d" }
+  );
 }
 
 async function updateUser(user: any, token: string) {
