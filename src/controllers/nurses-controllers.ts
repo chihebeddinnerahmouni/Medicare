@@ -8,6 +8,8 @@ import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
 import multer, { StorageEngine } from "multer";
+import fs from "fs";
+import findUserById from "../utils/find-user-by-id-and-type";
 dotenv.config();
 
 
@@ -177,10 +179,21 @@ export const updateNurseProfilePicture = async (
 ) => {
   const user = await nurseModel.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Delete the old profile picture if it exists
+  if (user.profilePicture) {
+    //const oldPicturePath = path.join(__dirname, doctor.profilePicture);
+    fs.unlink(user.profilePicture, (err) => {
+      if (err) console.error(`Failed to delete old picture at ${user.profilePicture}: `,err);
+    });
+  }
+
   user.profilePicture = req.file!.path;
 
   await user.save();
-  res.status(200).json({message: "Profile picture updated successfully",file: req.file!,});
+  res
+    .status(200)
+    .json({ message: "Profile picture updated successfully", file: req.file! });
 };
 (error: Error, req: Request, res: Response) => {
   if (error instanceof multer.MulterError) {

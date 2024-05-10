@@ -11,6 +11,8 @@ import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import multer, { StorageEngine } from "multer";
 import findUserById from "../utils/find-user-by-id-and-type";
+import fs from "fs";
+ 
 dotenv.config();
 declare global {
   namespace Express {
@@ -230,10 +232,21 @@ export const updateDoctorProfilePicture = async (
 ) => {
   const doctor = await doctormodel.findById(req.user.id);
   if (!doctor) return res.status(404).json({ message: "User not found" });
+
+  // Delete the old profile picture if it exists
+  if (doctor.profilePicture) {
+    //const oldPicturePath = path.join(__dirname, doctor.profilePicture);
+    fs.unlink(doctor.profilePicture, (err) => {
+      if (err) console.error(`Failed to delete old picture at ${doctor.profilePicture}: `,err);     
+    });
+  }
+
   doctor.profilePicture = req.file!.path;
 
   await doctor.save();
-  res.status(200).json({message: "Profile picture updated successfully",file: req.file!,});
+  res
+    .status(200)
+    .json({ message: "Profile picture updated successfully", file: req.file! });
 };
 (error: Error, req: Request, res: Response) => {
   if (error instanceof multer.MulterError) {
