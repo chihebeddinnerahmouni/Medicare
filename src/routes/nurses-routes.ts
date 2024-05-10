@@ -5,9 +5,11 @@ import {
   getNurseProfile,
   updatePassword,
   updateNurseProfile,
-  updateNurseEmail
+  updateNurseEmail,
+  updateNurseProfilePicture
 } from "../controllers/nurses-controllers";
-import  authGuard  from "../middlewear/authGuard";
+import authGuard from "../middlewear/authGuard";
+import upload from "../utils/multer-configs-to-images";
 
 
 const router = express.Router();
@@ -29,6 +31,9 @@ router.put("/profile/update-profile", authGuard, updateNurseProfile);
 
 //update email
 router.put("/profile/update-email", authGuard, updateNurseEmail);
+
+//update profile pic
+router.put("/profile/update-profile-picture",upload.single("profilePicture"),authGuard,updateNurseProfilePicture)
 
 
 

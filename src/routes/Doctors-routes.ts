@@ -6,9 +6,18 @@ import {
   getDoctorProfile,
   updatePassword,
   updateDoctorEmail,
-  updateDoctorProfile
+  updateDoctorProfile,
+  updateDoctorProfilePicture,
 } from "../controllers/doctor-controllers";
-import  authGuard  from "../middlewear/authGuard";
+import authGuard from "../middlewear/authGuard";
+import upload from "../utils/multer-configs-to-images";
+
+
+
+
+
+
+
 
 
 
@@ -33,12 +42,14 @@ router.get("/profile", authGuard, getDoctorProfile);
 //update password
 router.put("/profile/update-password", authGuard, updatePassword);
 
-//update profile
-router.put("/profile/update-profile", authGuard, updateDoctorProfile);
-
 //update email
 router.put("/profile/update-email", authGuard, updateDoctorEmail);
 
+//update profile
+router.put("/profile/update-profile", authGuard, updateDoctorProfile);
+
+//update profile pic
+router.put("/profile/update-profile-picture",upload.single("profilePicture"),authGuard,updateDoctorProfilePicture)
 
 
 

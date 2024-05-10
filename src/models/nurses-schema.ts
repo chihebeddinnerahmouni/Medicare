@@ -28,6 +28,8 @@ export interface INurse extends Document {
   token: string;
   refreshToken: string;
   tokenVersion: number;
+  profilePicture: string;
+  coverPicture: string;
 }
 
 // Doctor schema
@@ -47,6 +49,8 @@ const nurseschema = new Schema<INurse>({
   token: { type: String },
   refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
+  profilePicture: { type: String },
+  coverPicture: { type: String },
 });
 
 //hashing password before saving

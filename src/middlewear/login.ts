@@ -23,7 +23,7 @@ export const login = async (req: Request, res: Response) => {
         const validation = await validatePassword(password, user.password);
         if (!validation) return res.status(400).send("Invalid password");
          
-        if (user.online) return res.status(400).send("User already logged in");
+        //if (user.online) return res.status(400).send("User already logged in");
 
         const token = await generateToken(user, rememberMe);
         //const refreshToken = await generateRefreshToken(user);

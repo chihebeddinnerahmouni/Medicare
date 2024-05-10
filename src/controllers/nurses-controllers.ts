@@ -167,3 +167,25 @@ export const updateNurseEmail = async (req: Request, res: Response) => {
     res.send("error" + err);
   }
 }
+
+
+
+//update profile picture
+export const updateNurseProfilePicture = async (
+  req: Request,
+  res: Response
+) => {
+  const user = await nurseModel.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+  user.profilePicture = req.file!.path;
+
+  await user.save();
+  res.status(200).json({message: "Profile picture updated successfully",file: req.file!,});
+};
+(error: Error, req: Request, res: Response) => {
+  if (error instanceof multer.MulterError) {
+    res.status(500).json({ message: "There was an error uploading the file", error: error });
+  } else if (error) {
+    res.status(500).json({ message: "An unknown error occurred", error: error });
+  }
+};

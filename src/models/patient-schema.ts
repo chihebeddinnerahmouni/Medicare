@@ -18,6 +18,8 @@ interface IPatient extends Document {
   token: string;
   refreshToken: string;
   tokenVersion: number;
+  profilePicture: string;
+  coverPicture: string;
 }
 
 const patientSchema = new Schema<IPatient>({
@@ -33,6 +35,8 @@ const patientSchema = new Schema<IPatient>({
   token: { type: String },
   refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
+  profilePicture: { type: String },
+  coverPicture: { type: String },
 });
 
 patientSchema.pre("save", async function (next) {
