@@ -267,3 +267,13 @@ async function updatePicture(
 //______________________________________________________________________________________
 
 
+export const searchDoctor = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.query; // Get the search query from the request
+    const doctors = await doctormodel.find({ name: { $regex: `^${name}`, $options: "i" }, });
+    if (doctors.length === 0) return res.status(404).json({ message: "No doctor found" });
+    return res.json(doctors);
+  } catch (error) {
+    res.status(500).json({message: "An error occurred while searching for doctors",error: error,});
+  }
+};

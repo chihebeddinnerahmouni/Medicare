@@ -8,6 +8,7 @@ import { signupDoctor } from "../controllers/doctor-controllers";
 import { signupPatient } from "../controllers/patient-controllers";
 import  authGuard  from "../middlewear/authGuard";
 import { logout } from "../middlewear/log-out";
+import  searchMedicalStaff  from "../middlewear/search-medical-staff";
 
 
 const router = express.Router();
@@ -34,6 +35,9 @@ router.post("/login", login);
 router.get("/verify", verifyEmail);
 
 //logout
-router.post("/logout",authGuard ,logout);
+router.post("/logout", authGuard, logout);
+
+//search for doctor and nurses
+router.get("/search",  searchMedicalStaff);
 
 module.exports = router;

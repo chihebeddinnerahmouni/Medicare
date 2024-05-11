@@ -8,6 +8,7 @@ import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
 import fs from "fs";
+import patientModel from "../models/patient-schema";
 dotenv.config();
 
 
@@ -221,3 +222,14 @@ async function updatePicture(
 }
 
 //______________________________________________________________________________________
+
+export const searchPatient = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.query; // Get the search query from the request
+    const doctors = await patientModel.find({name: { $regex: `^${name}`, $options: "i" }});
+    if (doctors.length === 0) return res.status(404).json({ message: "No doctor found" });
+    return res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred while searching for doctors", error: error, });
+  }
+};

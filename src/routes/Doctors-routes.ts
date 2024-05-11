@@ -8,7 +8,8 @@ import {
   updateDoctorEmail,
   updateDoctorProfile,
   updateDoctorProfilePicture,
-  updateDoctorCoverPicture
+  updateDoctorCoverPicture,
+  searchDoctor
 } from "../controllers/doctor-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -33,6 +34,9 @@ router.get("/",getAllDoctors);
 
 // delete a doctor
 router.delete("/:name", deleteDoctor);
+
+// search doctor
+router.get("/search", searchDoctor);
 
 //add availabletime
 router.put("/profile/availabletime-Add", authGuard, AddAvailableTime);
