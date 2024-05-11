@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-import { AvailableTimeSchema, IAvailableTime } from "../utils/availableTime-table";
+import { AvailableTimeSchema, IAvailableTime } from "./availableTime-table";
 
 
 

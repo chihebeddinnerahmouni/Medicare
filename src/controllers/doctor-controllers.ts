@@ -5,12 +5,10 @@ import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import AvailableTime from "../utils/availableTime-table";
-import jwt from "jsonwebtoken";
+import AvailableTime from "../models/availableTime-table";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
-import multer, { StorageEngine } from "multer";
-import findUserById from "../utils/find-user-by-id-and-type";
+import { generate6Digits } from "../utils/generate-6-digits";
 import fs from "fs";
  
 dotenv.config();
@@ -104,13 +102,18 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
     const id = req.user.id;
     const user = await doctormodel.findById(id);
     if (!user) return res.status(400).send("Cannot find user to add available time");
-    const { day, hour, ticketNumber } = req.body;
 
-          const availableTime = new AvailableTime({
-            day,
-            hour,
-            ticketNumber,
-          });
+    const { day, hour, ticketNumber } = req.body;
+    const code = await generate6Digits();
+    const doctor = user.name;
+    
+    const availableTime = new AvailableTime({
+        day,
+        hour,
+        ticketNumber,
+        code,
+        doctor,
+    });
           await availableTime.save();
           user!.available.push(availableTime);
           await user!.save();
@@ -277,3 +280,53 @@ export const searchDoctor = async (req: Request, res: Response) => {
     res.status(500).json({message: "An error occurred while searching for doctors",error: error,});
   }
 };
+
+//______________________________________________________________________________________
+
+// delete all available times
+export const deleteAllAvailableTimes = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await doctormodel.findById(id);
+    if (!user) return res.status(400).send("Cannot find user to delete available times");
+    user.available = [];
+    await user.save();
+    res.json({ message: "all Available times deleted" });
+  } catch (error) {
+    res.status(400).send("Cannot delete available times" + error);
+  }
+}
+
+//______________________________________________________________________________________
+
+//reservation
+export const reserveDoctor = async (req: Request, res: Response) => {
+
+  try { 
+    const { doctorName, patientName, code } = req.body;
+
+    const doctor = await doctormodel.findOne({ name: doctorName });
+    if (!doctor) return res.status(400).send("Cannot find doctor to reserve");
+
+    const availableTimeInDoctor = doctor.available.find((time: any) => time.code === code);
+    if (!availableTimeInDoctor) return res.status(400).send("Cannot find available time in doctor to reserve");
+    if (availableTimeInDoctor.reserved) return res.status(400).send("This time is already reserved");
+
+    availableTimeInDoctor.reserved = true;
+    availableTimeInDoctor.patient = patientName;
+    await doctor.save();
+
+    const availableTime = await AvailableTime.findOne({ code });
+    if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
+    availableTime.reserved = true;
+    availableTime.patient = patientName;
+    await availableTime.save();
+
+    res.json({ message: "Reserved successfully" });
+  } catch (error) {
+    res.status(400).send("Cannot reserve" + error);
+  }
+}
+
+//______________________________________________________________________________________
+

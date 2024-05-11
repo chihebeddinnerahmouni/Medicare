@@ -9,7 +9,9 @@ import {
   updateDoctorProfile,
   updateDoctorProfilePicture,
   updateDoctorCoverPicture,
-  searchDoctor
+  searchDoctor,
+  deleteAllAvailableTimes,
+  reserveDoctor,
 } from "../controllers/doctor-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -59,7 +61,11 @@ router.put("/profile/update-profile-picture", upload.single("DocProfPic"), authG
 //update cover pic
 router.put("/profile/update-cover-picture",upload.single("DocCoverPic"),authGuard,updateDoctorCoverPicture);
 
+// delete all available times
+router.put("/profile/delete-all-available-times", authGuard, deleteAllAvailableTimes);
 
+//reservation
+router.put("/reservation", reserveDoctor);
 
 
 

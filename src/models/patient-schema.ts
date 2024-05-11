@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-import availableTime from "../utils/availableTime-table";
+import availableTime from "./availableTime-table";
 
 interface IPatient extends Document {
   name: string;

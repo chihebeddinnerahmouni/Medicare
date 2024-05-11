@@ -7,7 +7,7 @@ dotenv.config();
 import {
   AvailableTimeSchema,
   IAvailableTime,
-} from "../utils/availableTime-table";
+} from "./availableTime-table";
 
 
 // Nurse interface
