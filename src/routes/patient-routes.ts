@@ -6,7 +6,8 @@ import {
     updatePassword,
     updatePatientProfile,
     updatePatientEmail,
-    updatePatientProfilePicture
+    updatePatientProfilePicture,
+    updatePatientCoverPicture
 } from "../controllers/patient-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -34,9 +35,10 @@ router.put("/profile/update-profile", authGuard, updatePatientProfile);
 router.put("/profile/update-email", authGuard, updatePatientEmail);
 
 //update profile pic
-router.put("/profile/update-profile-picture",upload.single("profilePicture"),authGuard,updatePatientProfilePicture)
+router.put("/profile/update-profile-picture", upload.single("PatProfPic"), authGuard, updatePatientProfilePicture)
 
-
+//update cover pic
+router.put("/profile/update-cover-picture", upload.single("PatCoverPic"), authGuard, updatePatientCoverPicture)
 
 
 module.exports = router;

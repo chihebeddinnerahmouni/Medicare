@@ -64,6 +64,9 @@ export const signupDoctor = async (req: Request, res: Response) => {
   }
 };
 
+//______________________________________________________________________________________
+
+
 //get all doctors
 export const getAllDoctors = async (req: Request, res: Response) => {
   try {
@@ -74,6 +77,11 @@ export const getAllDoctors = async (req: Request, res: Response) => {
     res.status(400).send("degat");
   }
 };
+
+
+//______________________________________________________________________________________
+
+
 
 // delete a doctor
 export const deleteDoctor = async (req: Request, res: Response) => {
@@ -86,43 +94,37 @@ export const deleteDoctor = async (req: Request, res: Response) => {
   }
 };
 
+
+//______________________________________________________________________________________
+
+
 //add availabletime
 export const AddAvailableTime = async (req: Request, res: Response) => {
   try {
-    const authheader = req.headers.authorization;
-    const token = authheader && authheader.split(" ")[1];
-    jwt.verify(
-      token!,
-      process.env.secret_key as string,
-      async (err: any, result: any) => {
-        if (err) {
-          return res.status(401).json({ message: "Unauthorized" });
-        }
-        const userid = result._id;
-        const { day, hour, ticketNumber } = req.body;
-        const doctor = await doctormodel.findOne({ _id: userid });
-        if (!doctor) {
-          return res.status(400).send("Cannot find doctor");
-        } else {
+    const id = req.user.id;
+    const user = await doctormodel.findById(id);
+    if (!user) return res.status(400).send("Cannot find user to add available time");
+    const { day, hour, ticketNumber } = req.body;
+
           const availableTime = new AvailableTime({
             day,
             hour,
             ticketNumber,
           });
           await availableTime.save();
-          doctor!.available.push(availableTime);
-          await doctor!.save();
+          user!.available.push(availableTime);
+          await user!.save();
           res.json({
             message: "Available time added",
-            doctor: doctor,
+            doctor: user,
           });
-        }
-      }
-    );
   } catch (err) {
-    res.send("error" + err);
+    res.send("degat error" + err);
   }
 };
+
+
+//______________________________________________________________________________________
 
 //get profile
 export const getDoctorProfile = async (req: Request, res: Response) => {
@@ -143,6 +145,10 @@ export const getDoctorProfile = async (req: Request, res: Response) => {
   }
 };
 
+
+//______________________________________________________________________________________
+
+
 //update password
 export const updatePassword = async (req: Request, res: Response) => {
   try {
@@ -159,6 +165,10 @@ export const updatePassword = async (req: Request, res: Response) => {
     res.send("error degat" + error);
   }
 };
+
+
+//______________________________________________________________________________________
+
 
 //update profile
 export const updateDoctorProfile = async (req: Request, res: Response) => {
@@ -192,12 +202,7 @@ const updateUserFields = (user: any, fields: any) => { // teb3a l update profile
 };
 
 
-
-
-
-
-
-
+//______________________________________________________________________________________
 
 
 //update email
@@ -224,34 +229,41 @@ export const updateDoctorEmail = async (req: Request, res: Response) => {
 }
 
 
+//______________________________________________________________________________________
+
 
 //update profile picture
-export const updateDoctorProfilePicture = async (
-  req: Request,
-  res: Response
-) => {
-  const doctor = await doctormodel.findById(req.user.id);
-  if (!doctor) return res.status(404).json({ message: "User not found" });
+export const updateDoctorProfilePicture = (req: Request, res: Response) => updatePicture(req, res, "profilePicture");
 
-  // Delete the old profile picture if it exists
-  if (doctor.profilePicture) {
-    //const oldPicturePath = path.join(__dirname, doctor.profilePicture);
-    fs.unlink(doctor.profilePicture, (err) => {
-      if (err) console.error(`Failed to delete old picture at ${doctor.profilePicture}: `,err);     
+//update cover picture
+export const updateDoctorCoverPicture = (req: Request, res: Response) => updatePicture(req, res, "coverPicture");
+
+//helper function to update picture
+async function updatePicture(
+  req: Request,
+  res: Response,
+  pictureField: "profilePicture" | "coverPicture"
+) {
+  const user = await doctormodel.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: `User not found` });
+
+  if (user[pictureField]) {
+    fs.unlink(user[pictureField], (err) => {
+      if (err)
+        console.error(
+          `Failed to delete old picture at ${user[pictureField]}: `,
+          err
+        );
     });
   }
 
-  doctor.profilePicture = req.file!.path;
-
-  await doctor.save();
+  user[pictureField] = req.file!.path;
+  await user.save();
   res
     .status(200)
-    .json({ message: "Profile picture updated successfully", file: req.file! });
-};
-(error: Error, req: Request, res: Response) => {
-  if (error instanceof multer.MulterError) {
-    res.status(500).json({ message: "There was an error uploading the file", error: error });
-  } else if (error) {
-    res.status(500).json({ message: "An unknown error occurred", error: error });
-  }
-};
+    .json({ message: `${pictureField} updated successfully`, file: req.file! });
+}
+
+//______________________________________________________________________________________
+
+

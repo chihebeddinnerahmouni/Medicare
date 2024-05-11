@@ -55,6 +55,8 @@ export const signupPatient = async (req: Request, res: Response) => {
 };
 
 
+//______________________________________________________________________________________
+
 
 // get all patients
 export const getAllPatients = async (req: Request, res: Response) => {
@@ -66,6 +68,8 @@ export const getAllPatients = async (req: Request, res: Response) => {
     }
 }
 
+
+//______________________________________________________________________________________
 
 
 //delete a patient
@@ -80,8 +84,9 @@ export const deletePatient = async (req: Request, res: Response) => {
 }
 
 
+//______________________________________________________________________________________
 
-//get patient profile
+
 //get profile
 export const getPatientProfile = async (req: Request, res: Response) => { 
   try {
@@ -99,6 +104,8 @@ export const getPatientProfile = async (req: Request, res: Response) => {
   }
 };
 
+
+//______________________________________________________________________________________
 
 
 //update password
@@ -118,6 +125,7 @@ export const updatePassword = async (req: Request, res: Response) => {
 };
 
 
+//______________________________________________________________________________________
 
 
 //update profile
@@ -141,7 +149,7 @@ export const updatePatientProfile = async (req: Request, res: Response) => {
 };
 
 
-
+//______________________________________________________________________________________
 
 
 //update email
@@ -168,33 +176,39 @@ export const updatePatientEmail = async (req: Request, res: Response) => {
 }
 
 
-//update profile picture
-export const updatePatientProfilePicture = async (
-  req: Request,
-  res: Response
-) => {
-  const user = await patientModel.findById(req.user.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
+//______________________________________________________________________________________
 
-  // Delete the old profile picture if it exists
-  if (user.profilePicture) {
-    //const oldPicturePath = path.join(__dirname, doctor.profilePicture);
-    fs.unlink(user.profilePicture, (err) => {
-      if (err) console.error(`Failed to delete old picture at ${user.profilePicture}: `,err);
+
+//update profile picture
+export const updatePatientProfilePicture = (req: Request, res: Response) => updatePicture(req, res, "profilePicture");
+
+//update cover picture
+export const updatePatientCoverPicture = (req: Request, res: Response) => updatePicture(req, res, "coverPicture");
+
+//helper function to update picture
+async function updatePicture(
+  req: Request,
+  res: Response,
+  pictureField: "profilePicture" | "coverPicture"
+) {
+  const user = await patientModel.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: `User not found` });
+
+  if (user[pictureField]) {
+    fs.unlink(user[pictureField], (err) => {
+      if (err)
+        console.error(
+          `Failed to delete old picture at ${user[pictureField]}: `,
+          err
+        );
     });
   }
 
-  user.profilePicture = req.file!.path;
-
+  user[pictureField] = req.file!.path;
   await user.save();
   res
     .status(200)
-    .json({ message: "Profile picture updated successfully", file: req.file! });
-};
-(error: Error, req: Request, res: Response) => {
-  if (error instanceof multer.MulterError) {
-    res.status(500).json({ message: "There was an error uploading the file", error: error });
-  } else if (error) {
-    res.status(500).json({ message: "An unknown error occurred", error: error });
-  }
-};
+    .json({ message: `${pictureField} updated successfully`, file: req.file! });
+}
+
+//______________________________________________________________________________________

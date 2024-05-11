@@ -7,9 +7,7 @@ import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
-import multer, { StorageEngine } from "multer";
 import fs from "fs";
-import findUserById from "../utils/find-user-by-id-and-type";
 dotenv.config();
 
 
@@ -53,6 +51,9 @@ export const signupNurse = async (req: Request, res: Response) => {
     }
 };
 
+//______________________________________________________________________________________
+
+
 //get all nurses
 export const getAllNurses = async (req: Request, res: Response) => {
     try {
@@ -62,6 +63,10 @@ export const getAllNurses = async (req: Request, res: Response) => {
         res.status(400).json({ message: "Error getting all nurses", error: error });
     }
 };
+
+
+//______________________________________________________________________________________
+
 
 //delete a nurse
 export const deleteNurse = async (req: Request, res: Response) => {
@@ -73,6 +78,9 @@ export const deleteNurse = async (req: Request, res: Response) => {
         res.status(400).json({ message: "Error deleting nurse", error: error });
     }
 };
+
+
+//______________________________________________________________________________________
 
 
 //get profile
@@ -95,6 +103,8 @@ export const getNurseProfile = async (req: Request, res: Response) => {
 };
 
 
+//______________________________________________________________________________________
+
 
 //update password
 export const updatePassword = async (req: Request, res: Response) => { 
@@ -112,6 +122,8 @@ export const updatePassword = async (req: Request, res: Response) => {
   }
 };
 
+
+//______________________________________________________________________________________
 
 
 //update profile
@@ -146,6 +158,8 @@ const updateUserFields = (user: any, fields: any) => { // teb3a l update profile
 };
 
 
+//______________________________________________________________________________________
+
 
 //update email
 export const updateNurseEmail = async (req: Request, res: Response) => { 
@@ -171,34 +185,39 @@ export const updateNurseEmail = async (req: Request, res: Response) => {
 }
 
 
+//______________________________________________________________________________________
+
 
 //update profile picture
-export const updateNurseProfilePicture = async (
-  req: Request,
-  res: Response
-) => {
-  const user = await nurseModel.findById(req.user.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
+export const updateNurseProfilePicture = (req: Request, res: Response) => updatePicture(req, res, "profilePicture");
 
-  // Delete the old profile picture if it exists
-  if (user.profilePicture) {
-    //const oldPicturePath = path.join(__dirname, doctor.profilePicture);
-    fs.unlink(user.profilePicture, (err) => {
-      if (err) console.error(`Failed to delete old picture at ${user.profilePicture}: `,err);
+//update cover picture
+export const updateNurseCoverPicture = (req: Request, res: Response) => updatePicture(req, res, "coverPicture");
+
+//helper function to update picture
+async function updatePicture(
+  req: Request,
+  res: Response,
+  pictureField: "profilePicture" | "coverPicture"
+) {
+  const user = await nurseModel.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: `User not found` });
+
+  if (user[pictureField]) {
+    fs.unlink(user[pictureField], (err) => {
+      if (err)
+        console.error(
+          `Failed to delete old picture at ${user[pictureField]}: `,
+          err
+        );
     });
   }
 
-  user.profilePicture = req.file!.path;
-
+  user[pictureField] = req.file!.path;
   await user.save();
   res
     .status(200)
-    .json({ message: "Profile picture updated successfully", file: req.file! });
-};
-(error: Error, req: Request, res: Response) => {
-  if (error instanceof multer.MulterError) {
-    res.status(500).json({ message: "There was an error uploading the file", error: error });
-  } else if (error) {
-    res.status(500).json({ message: "An unknown error occurred", error: error });
-  }
-};
+    .json({ message: `${pictureField} updated successfully`, file: req.file! });
+}
+
+//______________________________________________________________________________________
