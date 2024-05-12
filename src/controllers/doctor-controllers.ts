@@ -315,6 +315,11 @@ export const sendreservationRequest = async (req: Request, res: Response) => {
 
     if (availableTimeInDoctor.reserved === "reserved") return res.status(400).send("This time is already reserved");
 
+    availableTimeInDoctor.reserved = "pending";
+
+    patient.reservationsRequests.push(availableTimeInDoctor)
+    await patient.save();
+
     const patientInfos: IRequest = {
       name: patient.name,
       profilePicture: patient.profilePicture,
@@ -322,7 +327,6 @@ export const sendreservationRequest = async (req: Request, res: Response) => {
     }
 
       availableTimeInDoctor.requestList.push(patientInfos);
-      availableTimeInDoctor.reserved = "pending";
       await doctor.save();
 
       const availableTime = await AvailableTimeModel.findOne({ code });
@@ -332,10 +336,6 @@ export const sendreservationRequest = async (req: Request, res: Response) => {
       await availableTime.save();
 
      
-    if (availableTime.default)
-    if (!patient.reservationsRequests) patient.reservationsRequests = [];
-    patient.reservationsRequests.push(availableTime);
-    await patient.save();
 
     res.json({ message: "Request sent succesfully please wait doctor to accept" });
   } catch (error) {

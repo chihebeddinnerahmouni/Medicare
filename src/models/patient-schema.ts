@@ -6,7 +6,7 @@ import { AvailableTimeSchema, IAvailableTime } from "./availableTime-table";
 dotenv.config();
 
 
-interface IPatient extends Document {
+export interface IPatient extends Document {
   name: string;
   phone: Number;
   email: string;
@@ -23,10 +23,10 @@ interface IPatient extends Document {
   coverPicture: string;
   //reservationsRequests: IAvailableTime[];
   reservationsRequests: IAvailableTime[];
-  reservations: IAvailableTime[];
+  //reservations: IAvailableTime[];
 }
 
-const patientSchema = new Schema<IPatient>({
+export const patientSchema = new Schema<IPatient>({
   name: { type: String, required: true, unique: true }, //
   phone: { type: Number, required: true, unique: true }, //
   email: { type: String, required: true, unique: true }, //
@@ -43,7 +43,7 @@ const patientSchema = new Schema<IPatient>({
   coverPicture: { type: String },
   //reservationsRequests: { type: [AvailableTimeSchema], default: [] },
   reservationsRequests: { type: [AvailableTimeSchema], default: [] },
-  reservations: { default: [] },
+  //reservations: { default: [] },
 });
 
 patientSchema.pre("save", async function (next) {

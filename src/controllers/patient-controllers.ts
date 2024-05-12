@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import patientModel from '../models/patient-schema';
+import patientModel, { patientSchema } from "../models/patient-schema";
 import { Request, Response, NextFunction } from 'express';
 import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
@@ -10,6 +10,7 @@ import crypto from 'crypto';
 import findByEmail from "../utils/find-by-email";
 import multer, { StorageEngine } from "multer";
 import fs from "fs";
+import { AvailableTimeSchema } from '../models/availableTime-table';
 dotenv.config();
 declare global {
     namespace Express {
@@ -212,3 +213,31 @@ async function updatePicture(
 }
 
 //______________________________________________________________________________________
+
+
+//delete all requests
+export const deleteAllRequests = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find patient to delete requests");
+    user.reservationsRequests = [];
+
+let uniqueKeys = [];
+for (let key of Object.keys(AvailableTimeSchema.paths)) {
+  if (AvailableTimeSchema.paths[key].options.unique) {
+    uniqueKeys.push(key);
+  }
+}
+console.log("Unique keys: " + uniqueKeys);
+
+    await user.save();
+    res.json({ message: "All requests deleted" });
+  } catch (error) {
+    res.send("error deleting all requests" + error);
+  }
+}
+
+//______________________________________________________________________________________
+
+
