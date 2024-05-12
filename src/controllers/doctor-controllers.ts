@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import doctormodel from "../models/doctor-schema";
+import patientModel from "../models/patient-schema";
 import dotenv from "dotenv";
 import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import AvailableTime from "../models/availableTime-table";
+import AvailableTimeModel, {IRequest} from "../models/availableTime-table";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import { generate6Digits } from "../utils/generate-6-digits";
@@ -19,6 +20,7 @@ declare global {
     }
   }
 }
+
 
 
 
@@ -106,13 +108,15 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
     const { day, hour, ticketNumber } = req.body;
     const code = await generate6Digits();
     const doctor = user.name;
+    const reserved = "free";
     
-    const availableTime = new AvailableTime({
+    const availableTime = new AvailableTimeModel({
         day,
         hour,
         ticketNumber,
         code,
         doctor,
+        reserved
     });
           await availableTime.save();
           user!.available.push(availableTime);
@@ -252,11 +256,7 @@ async function updatePicture(
 
   if (user[pictureField]) {
     fs.unlink(user[pictureField], (err) => {
-      if (err)
-        console.error(
-          `Failed to delete old picture at ${user[pictureField]}: `,
-          err
-        );
+      if (err) console.error(`Failed to delete old picture at ${user[pictureField]}: `,err);
     });
   }
 
@@ -291,6 +291,7 @@ export const deleteAllAvailableTimes = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send("Cannot find user to delete available times");
     user.available = [];
     await user.save();
+    await AvailableTimeModel.deleteMany({ doctor: user.name /*, reserved: "free"*/});
     res.json({ message: "all Available times deleted" });
   } catch (error) {
     res.status(400).send("Cannot delete available times" + error);
@@ -300,33 +301,46 @@ export const deleteAllAvailableTimes = async (req: Request, res: Response) => {
 //______________________________________________________________________________________
 
 //reservation
-export const reserveDoctor = async (req: Request, res: Response) => {
+export const sendreservationRequest = async (req: Request, res: Response) => {
 
-  try { 
+  try {
     const { doctorName, patientName, code } = req.body;
 
     const doctor = await doctormodel.findOne({ name: doctorName });
     if (!doctor) return res.status(400).send("Cannot find doctor to reserve");
-
+    const patient = await patientModel.findOne({ name: patientName });
+    if (!patient) return res.status(400).send("Cannot find patient to reserve");
     const availableTimeInDoctor = doctor.available.find((time: any) => time.code === code);
     if (!availableTimeInDoctor) return res.status(400).send("Cannot find available time in doctor to reserve");
-    if (availableTimeInDoctor.reserved) return res.status(400).send("This time is already reserved");
 
-    availableTimeInDoctor.reserved = true;
-    availableTimeInDoctor.patient = patientName;
-    await doctor.save();
+    if (availableTimeInDoctor.reserved === "reserved") return res.status(400).send("This time is already reserved");
 
-    const availableTime = await AvailableTime.findOne({ code });
-    if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
-    availableTime.reserved = true;
-    availableTime.patient = patientName;
-    await availableTime.save();
+    const patientInfos: IRequest = {
+      name: patient.name,
+      profilePicture: patient.profilePicture,
+      phone: patient.phone
+    }
 
-    res.json({ message: "Reserved successfully" });
+      availableTimeInDoctor.requestList.push(patientInfos);
+      availableTimeInDoctor.reserved = "pending";
+      await doctor.save();
+
+      const availableTime = await AvailableTimeModel.findOne({ code });
+      if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
+      availableTime.requestList.push(patientInfos);
+      availableTime.reserved = "pending";
+      await availableTime.save();
+
+     
+    if (availableTime.default)
+    if (!patient.reservationsRequests) patient.reservationsRequests = [];
+    patient.reservationsRequests.push(availableTime);
+    await patient.save();
+
+    res.json({ message: "Request sent succesfully please wait doctor to accept" });
   } catch (error) {
-    res.status(400).send("Cannot reserve" + error);
+    res.status(400).send("Cannot send reservation request: " + error);
   }
 }
 
-//______________________________________________________________________________________
-
+//________________________________________________________________________________________

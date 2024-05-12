@@ -39,7 +39,7 @@ const doctorschema = new Schema<IDoctor>({
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true }, //
   location: { type: String, required: true },
-  available: { type: [AvailableTimeSchema], default: [] },
+  available: { type: [AvailableTimeSchema], default: []},
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
