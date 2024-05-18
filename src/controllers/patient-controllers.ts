@@ -1,16 +1,17 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import patientModel, { patientSchema } from "../models/patient-schema";
-import { Request, Response, NextFunction } from 'express';
+import patientModel from "../models/patient-schema";
+import { Request, Response } from 'express';
 import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import crypto from 'crypto';
 import findByEmail from "../utils/find-by-email";
-import multer, { StorageEngine } from "multer";
 import fs from "fs";
-import { AvailableTimeSchema } from '../models/availableTime-table';
+import { IRequest } from '../models/availableTime-table';
+import doctormodel from '../models/doctor-schema';
+import AvailableTimeModel from '../models/availableTime-table';
+
 dotenv.config();
 declare global {
     namespace Express {
@@ -223,14 +224,6 @@ export const deleteAllRequests = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send("Cannot find patient to delete requests");
     user.reservationsRequests = [];
 
-let uniqueKeys = [];
-for (let key of Object.keys(AvailableTimeSchema.paths)) {
-  if (AvailableTimeSchema.paths[key].options.unique) {
-    uniqueKeys.push(key);
-  }
-}
-console.log("Unique keys: " + uniqueKeys);
-
     await user.save();
     res.json({ message: "All requests deleted" });
   } catch (error) {
@@ -241,3 +234,47 @@ console.log("Unique keys: " + uniqueKeys);
 //______________________________________________________________________________________
 
 
+//reservation
+export const sendReservationRequest = async (req: Request, res: Response) => {
+
+  try {
+    const { doctorName, code } = req.body;
+
+    const id = req.user.id;
+
+    const doctor = await doctormodel.findOne({ name: doctorName });
+    if (!doctor) return res.status(400).send("Cannot find doctor to reserve");
+    const patient = await patientModel.findById(id);
+    if (!patient) return res.status(400).send("Cannot find patient to reserve");
+    const availableTimeInDoctor = doctor.available.find((time: any) => time.code === code);
+    if (!availableTimeInDoctor) return res.status(400).send("Cannot find available time in doctor to reserve");
+
+    if (availableTimeInDoctor.reserved === "reserved") return res.status(400).send("This time is already reserved");
+
+    availableTimeInDoctor.reserved = "pending";
+
+    patient.reservationsRequests.push(availableTimeInDoctor)
+    await patient.save();
+
+    const patientInfos: IRequest = {
+      name: patient.name,
+      profilePicture: patient.profilePicture,
+      phone: patient.phone
+    }
+
+      availableTimeInDoctor.requestList.push(patientInfos);
+      await doctor.save();
+
+      const availableTime = await AvailableTimeModel.findOne({ code });
+      if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
+      availableTime.requestList.push(patientInfos);
+      availableTime.reserved = "pending";
+      await availableTime.save();
+
+     
+
+    res.json({ message: "Request sent succesfully please wait doctor to accept" });
+  } catch (error) {
+    res.status(400).send("Cannot send reservation request: " + error);
+  }
+}

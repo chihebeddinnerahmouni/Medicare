@@ -11,7 +11,7 @@ import {
   updateDoctorCoverPicture,
   searchDoctor,
   deleteAllAvailableTimes,
-  sendreservationRequest,
+  confirmReservation
 } from "../controllers/doctor-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -64,8 +64,8 @@ router.put("/profile/update-cover-picture",upload.single("DocCoverPic"),authGuar
 // delete all available times
 router.put("/profile/delete-all-available-times", authGuard, deleteAllAvailableTimes);
 
-//reservation
-router.put("/send-reservation-request", sendreservationRequest);
+//confirme reservation
+router.put("/profile/confirm-reservation", authGuard, confirmReservation);
 
 
 

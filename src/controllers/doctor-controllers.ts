@@ -300,47 +300,37 @@ export const deleteAllAvailableTimes = async (req: Request, res: Response) => {
 
 //______________________________________________________________________________________
 
-//reservation
-export const sendreservationRequest = async (req: Request, res: Response) => {
 
+//confirm reservation
+export const confirmReservation = async (req: Request, res: Response) => {
   try {
-    const { doctorName, patientName, code } = req.body;
+    const { code, patientName } = req.body;
 
-    const doctor = await doctormodel.findOne({ name: doctorName });
-    if (!doctor) return res.status(400).send("Cannot find doctor to reserve");
     const patient = await patientModel.findOne({ name: patientName });
-    if (!patient) return res.status(400).send("Cannot find patient to reserve");
-    const availableTimeInDoctor = doctor.available.find((time: any) => time.code === code);
-    if (!availableTimeInDoctor) return res.status(400).send("Cannot find available time in doctor to reserve");
+    const doctor = await doctormodel.findById(req.user.id);
+    const availableTime = await AvailableTimeModel.findOne({ code });
+    const rdvInDoctor = doctor!.available.find((time: any) => time.code === code);
+    const rdvInPatient = patient!.reservationsRequests.find((time: any) => time.code === code);
+    if (!patient) return res.status(400).send("Cannot find patient");
+    if (!doctor) return res.status(400).send("Cannot find doctor");
+    if (!availableTime) return res.status(400).send("Cannot find available time");
+    if (availableTime.reserved === "reserved") return res.status(400).send("This time is already reserved");
 
-    if (availableTimeInDoctor.reserved === "reserved") return res.status(400).send("This time is already reserved");
+    availableTime.reserved = "reserved";
+    availableTime.patient = patientName;
+    availableTime.requestList = [];
+    await availableTime.save();
 
-    availableTimeInDoctor.reserved = "pending";
+    rdvInDoctor!.reserved = "reserved";
+    rdvInDoctor!.patient = patientName;
+    rdvInDoctor!.requestList = [];
+    await doctor.save();
 
-    patient.reservationsRequests.push(availableTimeInDoctor)
+    rdvInPatient!.reserved = "reserved";
     await patient.save();
 
-    const patientInfos: IRequest = {
-      name: patient.name,
-      profilePicture: patient.profilePicture,
-      phone: patient.phone
-    }
-
-      availableTimeInDoctor.requestList.push(patientInfos);
-      await doctor.save();
-
-      const availableTime = await AvailableTimeModel.findOne({ code });
-      if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
-      availableTime.requestList.push(patientInfos);
-      availableTime.reserved = "pending";
-      await availableTime.save();
-
-     
-
-    res.json({ message: "Request sent succesfully please wait doctor to accept" });
+    res.json({ message: `Reservation confirmed to ${patient.name}` });
   } catch (error) {
-    res.status(400).send("Cannot send reservation request: " + error);
+    res.status(400).send("Cannot confirm reservation" + error);
   }
 }
-
-//________________________________________________________________________________________

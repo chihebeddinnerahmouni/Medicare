@@ -23,11 +23,11 @@ export const AvailableTimeSchema = new Schema({
 });
 
 export interface IAvailableTime extends Document {
-  day: String;
-  hour: String;
+  day: string;
+  hour: string;
   ticketNumber: number;
   reserved: "reserved" | "free" | "pending";
-  code: Number | undefined;
+  code: number | string| undefined;
   doctor: string;
   patient: string;
   requestList: IRequest[];
