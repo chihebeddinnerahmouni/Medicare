@@ -1,13 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-
-
-export interface IRequest {
-  // Define the properties of the request object here
-  name: string;
-  profilePicture: string;
-  phone: Number;
-  // Add more properties as needed
-}
+import { IRequest } from "./requests-models";
 
 
 

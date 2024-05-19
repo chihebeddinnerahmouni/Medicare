@@ -8,7 +8,7 @@ import sendinSignupEmail from "../utils/sending-Signup-email";
 import crypto from 'crypto';
 import findByEmail from "../utils/find-by-email";
 import fs from "fs";
-import { IRequest } from '../models/availableTime-table';
+import { IRequest, IReservationRequests } from '../models/requests-models';
 import doctormodel from '../models/doctor-schema';
 import AvailableTimeModel from '../models/availableTime-table';
 
@@ -225,7 +225,7 @@ export const deleteAllRequests = async (req: Request, res: Response) => {
     user.reservationsRequests = [];
 
     await user.save();
-    res.json({ message: "All requests deleted" });
+    res.json({ message: `All requests deleted, thank you ${user.name}` });
   } catch (error) {
     res.send("error deleting all requests" + error);
   }
@@ -253,7 +253,18 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
 
     availableTimeInDoctor.reserved = "pending";
 
-    patient.reservationsRequests.push(availableTimeInDoctor)
+    //const availableTimeInPatient = availableTimeInDoctor;
+    //availableTimeInPatient.requestList = [];
+    //patient.reservationsRequests.push(availableTimeInPatient);
+    const rdvInPatient = {
+      day: availableTimeInDoctor.day,
+      hour: availableTimeInDoctor.hour,
+      ticketNumber: availableTimeInDoctor.ticketNumber,
+      reserved: "pending",
+      code: availableTimeInDoctor.code,
+      doctor: doctorName
+    } as IReservationRequests;
+    patient.reservationsRequests.push(rdvInPatient);
     await patient.save();
 
     const patientInfos: IRequest = {
@@ -273,7 +284,7 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
 
      
 
-    res.json({ message: "Request sent succesfully please wait doctor to accept" });
+    res.json({ message: `Request sent succesfully please wait doctor to accept, thank you ${patient.name}` });
   } catch (error) {
     res.status(400).send("Cannot send reservation request: " + error);
   }

@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { sign } from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import { AvailableTimeSchema, IAvailableTime } from "./availableTime-table";

@@ -1,8 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { sign } from "jsonwebtoken";
 import dotenv from "dotenv";
-import { AvailableTimeSchema, IAvailableTime } from "./availableTime-table";
+import { AvailableTimeSchema } from "./availableTime-table";
+import {
+  IReservationRequests,
+  reservationRequestsSchema,
+} from "./requests-models";
 dotenv.config();
 
 
@@ -22,7 +25,7 @@ export interface IPatient extends Document {
   profilePicture: string;
   coverPicture: string;
   //reservationsRequests: IAvailableTime[];
-  reservationsRequests: IAvailableTime[];
+  reservationsRequests: IReservationRequests[];
   //reservations: IAvailableTime[];
 }
 
@@ -41,9 +44,7 @@ export const patientSchema = new Schema<IPatient>({
   tokenVersion: { type: Number, default: 0 },
   profilePicture: { type: String },
   coverPicture: { type: String },
-  //reservationsRequests: { type: [AvailableTimeSchema], default: [] },
-  reservationsRequests: { type: [AvailableTimeSchema], default: [] },
-  //reservations: { default: [] },
+  reservationsRequests: { type: [reservationRequestsSchema], default: [] },
 });
 
 patientSchema.pre("save", async function (next) {

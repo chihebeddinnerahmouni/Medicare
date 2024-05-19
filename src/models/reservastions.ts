@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+/*import mongoose, {Schema} from "mongoose";
 import IAvailableTime from "./availableTime-table";
 import doctormodel from "./doctor-schema";
 import patientModel from "./patient-schema";
@@ -23,4 +23,4 @@ const ReservationModel = mongoose.model<IReservation>(
   ReservationSchema
 );
 
-export default ReservationModel;
+export default ReservationModel;*/

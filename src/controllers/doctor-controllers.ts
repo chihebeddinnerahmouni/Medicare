@@ -6,7 +6,8 @@ import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import AvailableTimeModel, {IRequest} from "../models/availableTime-table";
+import AvailableTimeModel from "../models/availableTime-table";
+import { IRequest } from "../models/requests-models";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import { generate6Digits } from "../utils/generate-6-digits";
@@ -327,6 +328,7 @@ export const confirmReservation = async (req: Request, res: Response) => {
     await doctor.save();
 
     rdvInPatient!.reserved = "reserved";
+    //rdvInPatient!.requestList = [];
     await patient.save();
 
     res.json({ message: `Reservation confirmed to ${patient.name}` });
