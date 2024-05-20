@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import doctormodel from "./doctor-schema";
-import patientModel from "../patients/patient-schema";
+import doctormodel from "../models/doctor-schema";
+import patientModel from "../models/patient-schema";
 import dotenv from "dotenv";
-import handlePasswordStrength from "../../utils/check-password-strength";
-import isFieldMissing from "../../utils/is-missing-field";
-import handleExistingUser from "../../utils/check-execisting-user-phemna";
-import sendinSignupEmail from "../../utils/sending-Signup-email";
-import AvailableTimeModel from "../../models/availableTime-schema";
-import { reservationRequestsModel } from "../../models/requests-models";
+import handlePasswordStrength from "../utils/check-password-strength";
+import isFieldMissing from "../utils/is-missing-field";
+import handleExistingUser from "../utils/check-execisting-user-phemna";
+import sendinSignupEmail from "../utils/sending-Signup-email";
+import AvailableTimeModel from "../models/availableTime-schema";
+import { reservationRequestsModel } from "../models/requests-models";
 import crypto from "crypto";
-import  findByEmail  from "../../utils/find-by-email";
-import { generate6Digits } from "../../utils/generate-6-digits";
+import  findByEmail  from "../utils/find-by-email";
+import { generate6Digits } from "../utils/generate-6-digits";
 import fs from "fs";
  
 dotenv.config();

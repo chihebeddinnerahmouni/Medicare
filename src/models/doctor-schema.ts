@@ -1,17 +1,13 @@
-import mongoose from 'mongoose';
-import { Document, Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 dotenv.config();
-import {
-  AvailableTimeSchema,
-  IAvailableTime,
-} from "../../models/availableTime-schema";
+import { AvailableTimeSchema, IAvailableTime } from "./availableTime-schema";
 
 
-// Nurse interface
-export interface INurse extends Document {
+
+// Doctor interface
+export interface IDoctor extends Document {
   name: string;
   specialite: string;
   phone: Number;
@@ -30,21 +26,23 @@ export interface INurse extends Document {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
-}
+};
+
+
 
 // Doctor schema
-const nurseschema = new Schema<INurse>({
+const doctorschema = new Schema<IDoctor>({
   name: { type: String, required: true, unique: true }, //
   specialite: { type: String, required: true },
   phone: { type: Number, required: true, unique: true }, //
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true }, //
   location: { type: String, required: true },
-  available: { type: [AvailableTimeSchema], default: [] },
+  available: { type: [AvailableTimeSchema], default: []},
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  demandingNewPassword: { type: String, default: false},
+  demandingNewPassword: { type: Boolean, default: false},
   online: { type: Boolean, default: false },
   token: { type: String },
   refreshToken: { type: String },
@@ -53,17 +51,20 @@ const nurseschema = new Schema<INurse>({
   coverPicture: { type: String },
 });
 
+
 //hashing password before saving
-nurseschema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+doctorschema.pre("save", async function (next) {
+  if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
 
-//create a model for schema
-const nurseModel = mongoose.model<INurse>('nurse', nurseschema);
 
-//export model
-export default nurseModel;
+
+
+//create a model for schema
+const doctormodel = mongoose.model<IDoctor>("doctor", doctorschema);
+
+export default doctormodel;

@@ -15,11 +15,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 //routes
-app.use('/doctors', require('./modules/doctors/doctors-routes'));
-app.use('/patients', require('./modules/patients/patient-routes'));
-app.use('/nurses', require('./modules/nurses/nurses-routes'));
+app.use('/doctors', require('./routes/doctors-routes'));
+app.use('/patients', require('./routes/patient-routes'));
+app.use('/nurses', require('./routes/nurses-routes'));
 app.use('/', require('./routes/common-routes'));
-
 
 
 

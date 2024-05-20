@@ -24,7 +24,7 @@ const authGuard = async (
         return res.status(401).json({ message: 'Invalid token', error: err });
       } 
 
-        const id = payload.id;
+        /*const id = payload.id;
         const type = payload.type;
         const tokenVersion = payload.tokenVersion;
         const user = await findUserById(req, res, type, id);
@@ -35,7 +35,7 @@ const authGuard = async (
             user.tokenVersion += 1;
           await user.save();
           return res.status(401).json({ message: 'token version not matched and u r logged out' });
-        }
+        }*/
       
 
         req.user = payload;

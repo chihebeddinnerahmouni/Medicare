@@ -1,21 +1,21 @@
 import dotenv from 'dotenv';
-import patientModel from "./patient-schema";
+import patientModel from "../models/patient-schema";
 import { Request, Response } from 'express';
-import handlePasswordStrength from "../../utils/check-password-strength";
-import isFieldMissing from "../../utils/is-missing-field";
-import handleExistingUser from "../../utils/check-execisting-user-phemna";
-import sendinSignupEmail from "../../utils/sending-Signup-email";
+import handlePasswordStrength from "../utils/check-password-strength";
+import isFieldMissing from "../utils/is-missing-field";
+import handleExistingUser from "../utils/check-execisting-user-phemna";
+import sendinSignupEmail from "../utils/sending-Signup-email";
 import crypto from 'crypto';
-import findByEmail from "../../utils/find-by-email";
+import findByEmail from "../utils/find-by-email";
 import fs from "fs";
 import {
   IRequest,
   IReservationRequests,
   reservationRequestsModel,
-} from "../../models/requests-models";
-import ReservationModel from '../../models/reservastions-schema';
-import doctormodel from '../doctors/doctor-schema';
-import AvailableTimeModel from '../../models/availableTime-schema';
+} from "../models/requests-models";
+import ReservationModel from '../models/reservastions-schema';
+import doctormodel from '../models/doctor-schema';
+import AvailableTimeModel from '../models/availableTime-schema';
 
 dotenv.config();
 declare global {

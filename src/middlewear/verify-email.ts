@@ -1,6 +1,6 @@
-import doctormodel from "../modules/doctors/doctor-schema";
-import patientModel from "../modules/patients/patient-schema";
-import nurseModel from "../modules/nurses/nurses-schema";
+import doctormodel from "../models/doctor-schema";
+import patientModel from "../models/patient-schema";
+import nurseModel from "../models/nurses-schema";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";

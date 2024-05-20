@@ -10,16 +10,17 @@ import {
     updatePatientCoverPicture,
     deleteAllRequests,
     sendReservationRequest
-} from "./patient-controllers";
-import authGuard from "../../middlewear/authGuard";
-import upload from "../../utils/multer-configs-to-images";
+} from "../controllers/patient-controllers";
+import authGuard from "../middlewear/authGuard";
+import adminAuthGuard from "../middlewear/admin-authGuard";
+import upload from "../utils/multer-configs-to-images";
 
 
 const router = express.Router();
 
 
 //get all patients
-router.get("/", getAllPatients);
+router.get("/",adminAuthGuard, getAllPatients);
 
 //delete a patient
 router.delete("/:name", deletePatient);

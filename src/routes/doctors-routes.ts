@@ -12,9 +12,9 @@ import {
   searchDoctor,
   deleteAllAvailableTimes,
   confirmReservation
-} from "./doctor-controllers";
-import authGuard from "../../middlewear/authGuard";
-import upload from "../../utils/multer-configs-to-images";
+} from "../controllers/doctor-controllers";
+import authGuard from "../middlewear/authGuard";
+import upload from "../utils/multer-configs-to-images";
 
 
 

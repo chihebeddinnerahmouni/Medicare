@@ -1,7 +1,7 @@
 import { Response } from "express";
-import doctormodel from "../modules/doctors/doctor-schema";
-import nurseModel from "../modules/nurses/nurses-schema";
-import patientModel from "../modules/patients/patient-schema";
+import doctormodel from "../models/doctor-schema";
+import nurseModel from "../models/nurses-schema";
+import patientModel from "../models/patient-schema";
 
 
 
