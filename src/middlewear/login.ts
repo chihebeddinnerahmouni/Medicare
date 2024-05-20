@@ -1,7 +1,7 @@
-import doctormodel from "../models/doctor-schema";
+import doctormodel from "../modules/doctors/doctor-schema";
 import { Request, Response } from "express";
-import nurseModel from "../models/nurses-schema";
-import patientModel from "../models/patient-schema";
+import nurseModel from "../modules/nurses/nurses-schema";
+import patientModel from "../modules/patients/patient-schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import isFieldMissing from "../utils/is-missing-field";

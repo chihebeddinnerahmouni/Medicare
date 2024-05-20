@@ -1,8 +1,8 @@
 import { Request, Response,NextFunction } from "express";
 import dotenv from "dotenv";
-import doctormodel from "../models/doctor-schema";
-import nurseModel from "../models/nurses-schema";
-import patientModel from "../models/patient-schema";
+import doctormodel from "../modules/doctors/doctor-schema";
+import nurseModel from "../modules/nurses/nurses-schema";
+import patientModel from "../modules/patients/patient-schema";
 import handlePasswordStrength from "../utils/check-password-strength";
 import jwt from "jsonwebtoken";
 import definingModel from "../utils/defining-model";

@@ -1,16 +1,21 @@
 import dotenv from 'dotenv';
-import patientModel from "../models/patient-schema";
+import patientModel from "./patient-schema";
 import { Request, Response } from 'express';
-import handlePasswordStrength from "../utils/check-password-strength";
-import isFieldMissing from "../utils/is-missing-field";
-import handleExistingUser from "../utils/check-execisting-user-phemna";
-import sendinSignupEmail from "../utils/sending-Signup-email";
+import handlePasswordStrength from "../../utils/check-password-strength";
+import isFieldMissing from "../../utils/is-missing-field";
+import handleExistingUser from "../../utils/check-execisting-user-phemna";
+import sendinSignupEmail from "../../utils/sending-Signup-email";
 import crypto from 'crypto';
-import findByEmail from "../utils/find-by-email";
+import findByEmail from "../../utils/find-by-email";
 import fs from "fs";
-import { IRequest, IReservationRequests } from '../models/requests-models';
-import doctormodel from '../models/doctor-schema';
-import AvailableTimeModel from '../models/availableTime-table';
+import {
+  IRequest,
+  IReservationRequests,
+  reservationRequestsModel,
+} from "../../models/requests-models";
+import ReservationModel from '../../models/reservastions-schema';
+import doctormodel from '../doctors/doctor-schema';
+import AvailableTimeModel from '../../models/availableTime-schema';
 
 dotenv.config();
 declare global {
@@ -222,9 +227,29 @@ export const deleteAllRequests = async (req: Request, res: Response) => {
     const id = req.user.id;
     const user = await patientModel.findById(id);
     if (!user) return res.status(400).send("Cannot find patient to delete requests");
-    user.reservationsRequests = [];
 
+// delete from patient
+    user.reservationsRequests = [];
     await user.save();
+
+//delete from doctor
+   const name = user.name;
+   await doctormodel.updateMany(
+     {},
+     { $pull: { "available.$[].requestList": { name } } }
+    );
+    
+//delete from reservationRequests
+    await reservationRequestsModel.deleteMany({
+      patient: name
+    });
+
+    //delete from availableTime
+    await AvailableTimeModel.updateMany(
+      {},
+      { $pull: { requestList: { name } } }
+    );
+
     res.json({ message: `All requests deleted, thank you ${user.name}` });
   } catch (error) {
     res.send("error deleting all requests" + error);
@@ -252,30 +277,36 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
     if (availableTimeInDoctor.reserved === "reserved") return res.status(400).send("This time is already reserved");
 
     availableTimeInDoctor.reserved = "pending";
-
-    //const availableTimeInPatient = availableTimeInDoctor;
-    //availableTimeInPatient.requestList = [];
-    //patient.reservationsRequests.push(availableTimeInPatient);
+//save in patient
     const rdvInPatient = {
       day: availableTimeInDoctor.day,
       hour: availableTimeInDoctor.hour,
       ticketNumber: availableTimeInDoctor.ticketNumber,
       reserved: "pending",
       code: availableTimeInDoctor.code,
-      doctor: doctorName
+      doctor: doctorName,
+      patient: patient.name
     } as IReservationRequests;
     patient.reservationsRequests.push(rdvInPatient);
     await patient.save();
 
+    //save in reservationRequests
+    const reservationRequest = new reservationRequestsModel(rdvInPatient);
+    await reservationRequest.save();
+
+    
+
+
+//save in doctor
     const patientInfos: IRequest = {
       name: patient.name,
       profilePicture: patient.profilePicture,
       phone: patient.phone
     }
-
       availableTimeInDoctor.requestList.push(patientInfos);
       await doctor.save();
 
+      //save in availableTime
       const availableTime = await AvailableTimeModel.findOne({ code });
       if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
       availableTime.requestList.push(patientInfos);

@@ -8,9 +8,9 @@ import {
   updateNurseEmail,
   updateNurseProfilePicture,
   updateNurseCoverPicture
-} from "../controllers/nurses-controllers";
-import authGuard from "../middlewear/authGuard";
-import upload from "../utils/multer-configs-to-images";
+} from "./nurses-controllers";
+import authGuard from "../../middlewear/authGuard";
+import upload from "../../utils/multer-configs-to-images";
 
 
 const router = express.Router();

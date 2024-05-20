@@ -15,7 +15,8 @@ export interface IReservationRequests {
   ticketNumber: number;
   reserved: string;
   code: number;
-  doctor: string;
+    doctor: string;
+    patient: string;
 }
 
 export const reservationRequestsSchema = new moongoose.Schema<IReservationRequests>({
@@ -24,7 +25,8 @@ export const reservationRequestsSchema = new moongoose.Schema<IReservationReques
     ticketNumber: { type: Number, required: true },
     reserved: { type: String, required: true },
     code: { type: Number, required: true },
-    doctor: { type: String, required: true }
+    doctor: { type: String, required: true },
+    patient: { type: String, required: true}
 });
     
 export const reservationRequestsModel = moongoose.model<IReservationRequests>("reservationRequests", reservationRequestsSchema);

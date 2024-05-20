@@ -1,7 +1,7 @@
-/*import mongoose, {Schema} from "mongoose";
-import IAvailableTime from "./availableTime-table";
-import doctormodel from "./doctor-schema";
-import patientModel from "./patient-schema";
+import mongoose, {Schema} from "mongoose";
+import IAvailableTime from "./availableTime-schema";
+import doctormodel from "../modules/doctors/doctor-schema";
+import patientModel from "../modules/patients/patient-schema";
 
  interface IReservation extends Document {
     doctor: typeof doctormodel["name"];
@@ -23,4 +23,4 @@ const ReservationModel = mongoose.model<IReservation>(
   ReservationSchema
 );
 
-export default ReservationModel;*/
+export default ReservationModel;

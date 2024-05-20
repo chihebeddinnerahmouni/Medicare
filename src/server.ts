@@ -2,9 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import doctormodel from './models/doctor-schema';
-import AvailableTimeModel from './models/availableTime-table';
-import patientsModel from './models/patient-schema';
+
 
 dotenv.config();    
 const app = express();
@@ -17,9 +15,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 //routes
-app.use('/doctors', require('./routes/Doctors-routes'));
-app.use('/patients', require('./routes/patient-routes'));
-app.use('/nurses', require('./routes/nurses-routes'));
+app.use('/doctors', require('./modules/doctors/doctors-routes'));
+app.use('/patients', require('./modules/patients/patient-routes'));
+app.use('/nurses', require('./modules/nurses/nurses-routes'));
 app.use('/', require('./routes/common-routes'));
 
 

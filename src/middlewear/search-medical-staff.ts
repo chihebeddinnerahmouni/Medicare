@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import doctorModel from '../models/doctor-schema';
-import nurseModel from '../models/nurses-schema';
+import doctorModel from '../modules/doctors/doctor-schema';
+import nurseModel from '../modules/nurses/nurses-schema';
 
 
 const searchMedicalStaff = async (req: Request, res: Response, next: NextFunction) => { 

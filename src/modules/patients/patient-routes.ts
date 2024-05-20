@@ -10,9 +10,9 @@ import {
     updatePatientCoverPicture,
     deleteAllRequests,
     sendReservationRequest
-} from "../controllers/patient-controllers";
-import authGuard from "../middlewear/authGuard";
-import upload from "../utils/multer-configs-to-images";
+} from "./patient-controllers";
+import authGuard from "../../middlewear/authGuard";
+import upload from "../../utils/multer-configs-to-images";
 
 
 const router = express.Router();

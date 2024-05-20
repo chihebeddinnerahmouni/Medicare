@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import nurseModel from "../models/nurses-schema";
+import nurseModel from "./nurses-schema";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import handlePasswordStrength from "../utils/check-password-strength";
-import isFieldMissing from "../utils/is-missing-field";
-import handleExistingUser from "../utils/check-execisting-user-phemna";
-import sendinSignupEmail from "../utils/sending-Signup-email";
-import findByEmail from "../utils/find-by-email";
+import handlePasswordStrength from "../../utils/check-password-strength";
+import isFieldMissing from "../../utils/is-missing-field";
+import handleExistingUser from "../../utils/check-execisting-user-phemna";
+import sendinSignupEmail from "../../utils/sending-Signup-email";
+import findByEmail from "../../utils/find-by-email";
 import fs from "fs";
-import patientModel from "../models/patient-schema";
+import patientModel from "../patients/patient-schema";
 dotenv.config();
 
 

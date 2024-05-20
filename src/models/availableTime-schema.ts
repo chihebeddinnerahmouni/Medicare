@@ -18,7 +18,7 @@ export interface IAvailableTime extends Document {
   day: string;
   hour: string;
   ticketNumber: number;
-  reserved: "reserved" | "free" | "pending";
+  reserved: "reserved" | "free" | "pending" | "rejected";
   code: number | string| undefined;
   doctor: string;
   patient: string;
