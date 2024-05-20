@@ -12,10 +12,11 @@ import {
   IRequest,
   IReservationRequests,
   reservationRequestsModel,
-} from "../models/requests-models";
-import ReservationModel from '../models/reservastions-schema';
+  AvailableTimeModel,
+  ReservationModel
+} from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
-import AvailableTimeModel from '../models/availableTime-schema';
+
 
 dotenv.config();
 declare global {

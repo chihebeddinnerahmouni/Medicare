@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import { AvailableTimeSchema } from "./availableTime-schema";
 import {
   IReservationRequests,
-  reservationRequestsSchema,
-} from "./requests-models";
+  reservationRequestsSchema
+} from "./reservations-utils";
+
 dotenv.config();
 
 

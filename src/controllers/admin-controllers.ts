@@ -2,7 +2,7 @@ import adminModel from "../models/admin-schema";
 import isFieldMissing from "../utils/is-missing-field";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import handlePasswordStrength from "../utils/check-password-strength";
-import AvailableTimeModel from "../models/availableTime-schema";
+import { AvailableTimeModel } from "../models/reservations-utils";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

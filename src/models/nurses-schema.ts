@@ -7,7 +7,7 @@ dotenv.config();
 import {
   AvailableTimeSchema,
   IAvailableTime,
-} from "./availableTime-schema";
+} from "./reservations-utils";
 
 
 // Nurse interface

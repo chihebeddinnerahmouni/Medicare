@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
-import { AvailableTimeSchema, IAvailableTime } from "./availableTime-schema";
+import { AvailableTimeSchema, IAvailableTime } from "./reservations-utils";
 
 
 

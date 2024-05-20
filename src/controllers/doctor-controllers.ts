@@ -6,8 +6,7 @@ import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import AvailableTimeModel from "../models/availableTime-schema";
-import { reservationRequestsModel } from "../models/requests-models";
+import {AvailableTimeModel} from "../models/reservations-utils";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import { generate6Digits } from "../utils/generate-6-digits";
@@ -126,7 +125,7 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
           user!.available.push(availableTime);
           await user!.save();
           res.json({
-            message: "Available time added",
+            message: `Available time added, thank you ${user.name}`,
             doctor: user,
           });
   } catch (err) {
@@ -339,3 +338,22 @@ export const confirmReservation = async (req: Request, res: Response) => {
     res.status(400).send("Cannot confirm reservation" + error);
   }
 }
+
+//______________________________________________________________________________________
+
+
+//add schedule
+/*export const addSchedule = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await doctormodel.findById(id);
+    if (!user) return res.status(400).send("Cannot find user to add schedule");
+
+    const { day, start, end } = req.body;
+    user.schedule.push({ day, start, end });
+    await user.save();
+    res.json({ message: `Schedule added, thank you ${user.name}`, doctor: user });
+  } catch (error) {
+    res.status(400).send("Cannot add schedule" + error);
+  }
+}*/
