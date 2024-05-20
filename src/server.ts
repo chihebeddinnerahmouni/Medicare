@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 //routes
+app.use('/admins', require('./routes/admin-routes'));
 app.use('/doctors', require('./routes/doctors-routes'));
 app.use('/patients', require('./routes/patient-routes'));
 app.use('/nurses', require('./routes/nurses-routes'));
