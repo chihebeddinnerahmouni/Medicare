@@ -30,8 +30,8 @@ mongoose.connect(DB!).then(() => {
     console.log("Connected to MongoDB")
 
     //delete unique index
-    /*mongoose.connection.collections["patients"]
-      .dropIndex("reservationsRequests.code_1")
+    /*mongoose.connection.collections["doctors"]
+      .dropIndex("location_1")
       .then(() => {
           console.log('Dropped index');
       })

@@ -70,8 +70,11 @@ export const signupDoctor = async (req: Request, res: Response) => {
 
 //get all doctors
 export const getAllDoctors = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = 3;
+  const skip = (page - 1) * limit
   try {
-    const doctors = await doctormodel.find();
+    const doctors = await doctormodel.find().skip(skip).limit(limit);
     //.select("name specialite phone location available");
     res.json(doctors);
   } catch (error) {
