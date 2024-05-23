@@ -6,7 +6,7 @@ import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import {AvailableTimeModel} from "../models/reservations-utils";
+import {AvailableTimeModel, scheduleModel} from "../models/reservations-utils";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import { generate6Digits } from "../utils/generate-6-digits";
@@ -343,17 +343,101 @@ export const confirmReservation = async (req: Request, res: Response) => {
 
 
 //add schedule
-/*export const addSchedule = async (req: Request, res: Response) => {
+export const addSchedule = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
+    const { day, start, end, checkTime } = req.body;
+
     const user = await doctormodel.findById(id);
     if (!user) return res.status(400).send("Cannot find user to add schedule");
 
-    const { day, start, end } = req.body;
-    user.schedule.push({ day, start, end });
+    const schedule = new scheduleModel({
+      day,
+      start,
+      end,
+      checkTime,
+      doctor: user.name,
+      freeAt: calculateTimeSlots(start, end, checkTime),
+    });
+    user.schedule.push(schedule);
     await user.save();
+    await schedule.save();
+
+
+
+
     res.json({ message: `Schedule added, thank you ${user.name}`, doctor: user });
   } catch (error) {
     res.status(400).send("Cannot add schedule" + error);
   }
+}
+
+function calculateTimeSlots( start: string, end: string, checkTime: number ): any[] {
+  let startTime = new Date(`1970-01-01T${start}`);
+  const endTime = new Date(`1970-01-01T${end}`);
+  const timeSlots = [];
+  let ticketNumber = 0;
+
+while (true) {
+  timeSlots.push({
+    hour: startTime.toISOString().substring(11, 16),
+    ticketNumber: ticketNumber++,});
+    if (
+      startTime.getHours() === endTime.getHours() &&
+      startTime.getMinutes() === endTime.getMinutes()
+    )
+      break;
+  startTime = new Date(startTime.getTime() + checkTime * 60000);
+}
+
+  /*while (startTime <= endTime) {
+    timeSlots.push(startTime.toISOString().substring(11, 16));
+    startTime.setMinutes(startTime.getMinutes() + checkTime);
+  }*/
+  return timeSlots;
+}
+
+//_______________________________________________________________________________________
+
+//delete all schedule
+export const deleteAllSchedule = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await doctormodel.findById(id);
+    if (!user) return res.status(400).send("Cannot find user to delete schedule");
+    user.schedule = [];
+    await user.save();
+    await scheduleModel.deleteMany({ doctor: user.name });
+    res.json({ message: `all schedule deleted, thank you ${user.name}` });
+  } catch (error) {
+    res.status(400).send("Cannot delete schedule" + error);
+  }
+}
+
+//_______________________________________________________________________________________
+
+//modify schedule
+/*function calculateTimeSlots(
+  start: string,
+  end: string,
+  checkTime: number
+): string[] {
+  const startTime = new Date(`1970-01-01T${start}Z`);
+  const endTime = new Date(`1970-01-01T${end}Z`);
+  const timeSlots = [];
+
+  while (startTime < endTime) {
+    timeSlots.push(startTime.toISOString().substring(11, 16));
+    startTime.setMinutes(startTime.getMinutes() + checkTime);
+  }
+
+  return timeSlots;
 }*/
+
+
+
+
+
+
+
+

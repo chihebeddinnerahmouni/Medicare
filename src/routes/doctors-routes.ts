@@ -11,31 +11,22 @@ import {
   updateDoctorCoverPicture,
   searchDoctor,
   deleteAllAvailableTimes,
-  confirmReservation
+  confirmReservation,
+  addSchedule,
+  deleteAllSchedule,
 } from "../controllers/doctor-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 const router = express.Router();
+
+
 
 // get all doctors
 router.get("/",getAllDoctors);
 
 // delete a doctor
-router.delete("/:name", deleteDoctor);
+router.delete("/:name", deleteDoctor); // admin only
 
 // search doctor
 router.get("/search", searchDoctor);
@@ -67,7 +58,11 @@ router.put("/profile/delete-all-available-times", authGuard, deleteAllAvailableT
 //confirme reservation
 router.put("/profile/confirm-reservation", authGuard, confirmReservation);
 
+//add schedule
+router.put("/profile/add-schedule", authGuard, addSchedule);
 
+//delete all schedule
+router.put("/profile/delete-all-schedules", authGuard, deleteAllSchedule);
 
 
 

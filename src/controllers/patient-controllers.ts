@@ -13,7 +13,7 @@ import {
   IReservationRequests,
   reservationRequestsModel,
   AvailableTimeModel,
-  ReservationModel
+  IPatientScheduleReservation,
 } from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
 
@@ -319,5 +319,47 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
     res.json({ message: `Request sent succesfully please wait doctor to accept, thank you ${patient.name}` });
   } catch (error) {
     res.status(400).send("Cannot send reservation request: " + error);
+  }
+}
+
+//______________________________________________________________________________________
+
+//reserve schedule ticket
+export const reserveScheduleTicket = async (req: Request, res: Response) => {
+  try {
+    const { doctor, day } = req.body;
+    const id = req.user.id;
+    const fields = [doctor, day];
+
+    if (isFieldMissing(fields)) return res.status(400).send("All fields are required");
+    
+    const patient = await patientModel.findById(id);
+    if (!patient) return res.status(400).send("Cannot find patient to reserve schedule ticket");
+    const doctorr = await doctormodel.findOne({ name: doctor });
+    if (!doctorr) return res.status(400).send("Cannot find doctor to reserve schedule ticket");
+
+    let schedule = doctorr.schedule.find((time: any) => time.day === day);
+    if (!schedule) return res.status(400).send("Cannot find schedule to reserve schedule ticket");
+
+    let freeSlot = schedule.freeAt.find((slot: any) => slot.reserved === "free");
+    if (!freeSlot) return res.status(400).send("Cannot find free slot to reserve schedule ticket");
+
+    freeSlot.reserved = "true";
+    await doctorr.save();
+
+    const scheduleReservation: IPatientScheduleReservation = {
+      day: schedule.day,
+      hour: freeSlot.hour,
+      ticketNumber: freeSlot.ticketNumber,
+      doctor: doctorr.name,
+      patient: patient.name,
+    }; 
+    patient.scheduleResevations.push(scheduleReservation);
+    await patient.save();
+
+    res.json({ message: `your ticket number is  ${freeSlot.ticketNumber}, thank you ${patient.name}` });
+    
+  } catch (error) {
+    res.status(400).send("Cannot reserve schedule ticket: " + error);
   }
 }

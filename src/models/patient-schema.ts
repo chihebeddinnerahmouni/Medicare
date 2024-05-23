@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import {
   IReservationRequests,
-  reservationRequestsSchema
+  reservationRequestsSchema,
+  IPatientScheduleReservation,
+  patientScheduleReservationSchema,
 } from "./reservations-utils";
 
 dotenv.config();
@@ -24,9 +26,8 @@ export interface IPatient extends Document {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
-  //reservationsRequests: IAvailableTime[];
   reservationsRequests: IReservationRequests[];
-  //reservations: IAvailableTime[];
+  scheduleResevations: IPatientScheduleReservation[];
 }
 
 export const patientSchema = new Schema<IPatient>({
@@ -45,6 +46,7 @@ export const patientSchema = new Schema<IPatient>({
   profilePicture: { type: String },
   coverPicture: { type: String },
   reservationsRequests: { type: [reservationRequestsSchema], default: [] },
+  scheduleResevations: { type: [patientScheduleReservationSchema], default: [] },
 });
 
 patientSchema.pre("save", async function (next) {

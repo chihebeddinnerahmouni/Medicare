@@ -9,7 +9,8 @@ import {
     updatePatientProfilePicture,
     updatePatientCoverPicture,
     deleteAllRequests,
-    sendReservationRequest
+    sendReservationRequest,
+    reserveScheduleTicket
 } from "../controllers/patient-controllers";
 import authGuard from "../middlewear/authGuard";
 import adminAuthGuard from "../middlewear/admin-authGuard";
@@ -46,8 +47,13 @@ router.put("/profile/update-cover-picture", upload.single("PatCoverPic"), authGu
 //delete all requests
 router.put("/profile/delete-requests", authGuard, deleteAllRequests)
 
-//reservation
-router.put("/profile/send-reservation-request",authGuard, sendReservationRequest);
+//reservation request
+router.put("/profile/send-reservation-request", authGuard, sendReservationRequest);
+
+//reserve a schedule ticket
+router.put("/profile/reserve-ticket", authGuard, reserveScheduleTicket);
+
+
 
 
 module.exports = router;

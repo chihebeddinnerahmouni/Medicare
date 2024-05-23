@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
-import { AvailableTimeSchema, IAvailableTime } from "./reservations-utils";
+import { AvailableTimeSchema, IAvailableTime, scheduleSchema, ISchedule} from "./reservations-utils";
 
 
 
@@ -26,6 +26,7 @@ export interface IDoctor extends Document {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
+  schedule: ISchedule[];
 };
 
 
@@ -38,17 +39,19 @@ const doctorschema = new Schema<IDoctor>({
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true }, //
   location: { type: String, required: true },
-  available: { type: [AvailableTimeSchema], default: []},
+  available: { type: [AvailableTimeSchema], default: [] },
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  demandingNewPassword: { type: Boolean, default: false},
+  demandingNewPassword: { type: Boolean, default: false },
   online: { type: Boolean, default: false },
   token: { type: String },
   refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
   profilePicture: { type: String },
   coverPicture: { type: String },
+  //schedule: { type: Schema.Types.ObjectId, ref: "schedule" },
+  schedule: { type: [scheduleSchema], default: []},
 });
 
 
