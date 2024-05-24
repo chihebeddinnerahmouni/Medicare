@@ -3,6 +3,7 @@ import {
   signupAdmin,
   loginAdmin,
   getDoctorsAvailableTimes,
+  getDoctorSchedules,
 } from "../controllers/admin-controllers";
 
 
@@ -17,6 +18,8 @@ router.post("/login", loginAdmin);
 //get all available times
 router.get("/doctors-available-times", getDoctorsAvailableTimes);
 
+//get all shedules
+router.get("/schedules", getDoctorSchedules);
 
 
 

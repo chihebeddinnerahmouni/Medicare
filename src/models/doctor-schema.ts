@@ -10,7 +10,7 @@ import { AvailableTimeSchema, IAvailableTime, scheduleSchema, ISchedule} from ".
 export interface IDoctor extends Document {
   name: string;
   specialite: string;
-  phone: Number;
+  phone: number;
   password: string;
   email: string;
   location: string;
@@ -20,7 +20,7 @@ export interface IDoctor extends Document {
   generateJWT: () => Promise<string>;
   type: string;
   demandingNewPassword: Boolean;
-  online: Boolean;
+  online: boolean;
   token: string;
   refreshToken: string;
   tokenVersion: number;

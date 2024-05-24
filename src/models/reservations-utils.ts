@@ -33,10 +33,10 @@ export const reservationRequestsSchema =
     patient: { type: String, required: true },
   });
 
-export const reservationRequestsModel = mongoose.model<IReservationRequests>(
+/*export const reservationRequestsModel = mongoose.model<IReservationRequests>(
   "reservationRequests",
   reservationRequestsSchema
-);
+);*/
 
 //______________________________________________________________________________________
 
@@ -53,7 +53,7 @@ export const AvailableTimeSchema = new Schema({
   requestList: { type: Array, default: [] }
 });
 
-export interface IAvailableTime extends Document {
+export interface IAvailableTime {
   day: string;
   hour: string;
   ticketNumber: number;
@@ -64,34 +64,11 @@ export interface IAvailableTime extends Document {
   requestList: IRequest[];
 }
 
-export const AvailableTimeModel = mongoose.model<IAvailableTime>(
+/*export const AvailableTimeModel = mongoose.model<IAvailableTime>(
   "AvailableTime",
   AvailableTimeSchema
 );
-
-//______________________________________________________________________________________
-
-//reservation
- interface IReservation extends Document {
-   doctor: string;
-   patient: string;
-   availableTime: any;
- }
-
- const ReservationSchema = new Schema({
-   doctor: { type: Schema.Types.ObjectId, ref: "Doctor", required: true },
-   patient: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
-   availableTime: {
-     type: Schema.Types.ObjectId,
-     ref: "AvailableTime",
-     required: true,
-   },
- });
-
- export const ReservationModel = mongoose.model<IReservation>(
-   "Reservation",
-   ReservationSchema
- );
+*/
 
 //______________________________________________________________________________________
 
@@ -100,12 +77,16 @@ export interface IScheduleDate {
   hour: string;
   ticketNumber: number;
   reserved: string;
+  patient: string;
+  patientPhone: number;
 }
 const scheduleDateSchema = new Schema(
   {
     hour: { type: String, required: true },
     ticketNumber: { type: Number, required: true },
     reserved: { type: String, required: true, default: "free" },
+    patient: { type: String },
+    patientPhone: { type: Number },
   },
   { _id: false }
 );
@@ -127,9 +108,9 @@ export const scheduleSchema = new Schema({
   checkTime: { type: Number, required: true },
   doctor: { type: String },
   freeAt: { type: [scheduleDateSchema] },
-});
+}, { _id: false });
 
-export const scheduleModel = mongoose.model<ISchedule>("schedule", scheduleSchema);
+//export const scheduleModel = mongoose.model<ISchedule>("schedule", scheduleSchema);
 
 
 //______________________________________________________________________________________
@@ -137,18 +118,22 @@ export const scheduleModel = mongoose.model<ISchedule>("schedule", scheduleSchem
 //patient schedule reservation
 export interface IPatientScheduleReservation {
   doctor: string;
-  patient: string;
   day: string;
   hour: string;
   ticketNumber: number;
+  location: string;
+  phone: number;
+  reservedAt: string;
 }
 
 export const patientScheduleReservationSchema = new Schema({
   doctor: { type: String, required: true },
-  patient: { type: String, required: true },
   day: { type: String, required: true },
   hour: { type: String, required: true },
   ticketNumber: { type: Number, required: true },
+  location: { type: String },
+  phone: { type: Number },
+  reseredAt: { type: String },
 },
 { _id: false });
 

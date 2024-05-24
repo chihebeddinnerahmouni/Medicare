@@ -11,8 +11,8 @@ import fs from "fs";
 import {
   IRequest,
   IReservationRequests,
-  reservationRequestsModel,
-  AvailableTimeModel,
+  //reservationRequestsModel,
+  //AvailableTimeModel,
   IPatientScheduleReservation,
 } from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
@@ -241,15 +241,15 @@ export const deleteAllRequests = async (req: Request, res: Response) => {
     );
     
 //delete from reservationRequests
-    await reservationRequestsModel.deleteMany({
+    /*await reservationRequestsModel.deleteMany({
       patient: name
-    });
+    });*/
 
     //delete from availableTime
-    await AvailableTimeModel.updateMany(
+    /*await AvailableTimeModel.updateMany(
       {},
       { $pull: { requestList: { name } } }
-    );
+    );*/
 
     res.json({ message: `All requests deleted, thank you ${user.name}` });
   } catch (error) {
@@ -292,8 +292,8 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
     await patient.save();
 
     //save in reservationRequests
-    const reservationRequest = new reservationRequestsModel(rdvInPatient);
-    await reservationRequest.save();
+    /*const reservationRequest = new reservationRequestsModel(rdvInPatient);
+    await reservationRequest.save();*/
 
     
 
@@ -308,11 +308,11 @@ export const sendReservationRequest = async (req: Request, res: Response) => {
       await doctor.save();
 
       //save in availableTime
-      const availableTime = await AvailableTimeModel.findOne({ code });
+      /*const availableTime = await AvailableTimeModel.findOne({ code });
       if (!availableTime) return res.status(400).send("Cannot find available time to reserve");
       availableTime.requestList.push(patientInfos);
       availableTime.reserved = "pending";
-      await availableTime.save();
+      await availableTime.save();*/
 
      
 
@@ -345,6 +345,7 @@ export const reserveScheduleTicket = async (req: Request, res: Response) => {
     if (!freeSlot) return res.status(400).send("Cannot find free slot to reserve schedule ticket");
 
     freeSlot.reserved = "true";
+    freeSlot.patient = patient.name;
     await doctorr.save();
 
     const scheduleReservation: IPatientScheduleReservation = {
@@ -352,8 +353,10 @@ export const reserveScheduleTicket = async (req: Request, res: Response) => {
       hour: freeSlot.hour,
       ticketNumber: freeSlot.ticketNumber,
       doctor: doctorr.name,
-      patient: patient.name,
-    }; 
+      location: doctorr.location,
+      phone: doctorr.phone,
+      reservedAt: new Date().getDay() + "/" + new Date().getMonth() + "," + new Date().getHours() + ":" + new Date().getMinutes(),
+    };
     patient.scheduleResevations.push(scheduleReservation);
     await patient.save();
 
@@ -363,3 +366,40 @@ export const reserveScheduleTicket = async (req: Request, res: Response) => {
     res.status(400).send("Cannot reserve schedule ticket: " + error);
   }
 }
+
+//_____________________________________________________________________________________
+
+//delete all schedule reservations
+export const deleteAllScheduleReservations = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find patient to delete schedule reservations");
+
+    user.scheduleResevations = [];
+    await user.save();
+
+await doctormodel.updateMany(
+  { "schedule.freeAt.patient": user.name },
+  { $set: { "schedule.$[].freeAt.$[slot].reserved": "free", "schedule.$[].freeAt.$[slot].patient": "" } },
+  { arrayFilters: [{ "slot.patient": user.name }] }
+);
+      
+    
+    res.json({ message: `All schedule reservations deleted, thank you ${user.name}` });
+  } catch (error) {
+    res.status(400).send("Cannot delete all schedule reservations: " + error);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,12 +2,13 @@ import adminModel from "../models/admin-schema";
 import isFieldMissing from "../utils/is-missing-field";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import handlePasswordStrength from "../utils/check-password-strength";
-import { AvailableTimeModel } from "../models/reservations-utils";
+//import { AvailableTimeModel } from "../models/reservations-utils";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
+import doctormodel from "../models/doctor-schema";
 dotenv.config();
 
 
@@ -93,12 +94,60 @@ async function updateUser(user: any, token: string) {
 //_______________________________________________________________________________________
 
 //get available times for doctors
-export const getDoctorsAvailableTimes = async (req: Request, res: Response) => { 
+/*export const getDoctorsAvailableTimes = async (req: Request, res: Response) => { 
     try {
     const times = await AvailableTimeModel.find();
     res.json(times);
   } catch (error) {
-    res.status(400).send("Error: " + error);
+    res.status(400).send("mana9drouch ya kho rak desactivitha: " + error);
   }
 }
+*/
+
+export const getDoctorsAvailableTimes = async (req: Request, res: Response) => {
+  try {
+    const doctors = await doctormodel.find();
+    const available : any = [];
+    
+    doctors.forEach((doctor) => {
+      const { available: availableTimes } = doctor;
+      availableTimes.forEach((availableTimes) => {
+        available.push({ availableTimes });
+      });
+    });
+
+    res.json({ available });
+
+  } catch (error) {
+    res.status(400).send("error:" + error);
+  }
+}
+
+//_______________________________________________________________________________________
+
+//get all shedules
+export const getDoctorSchedules = async (req: Request, res: Response) => {
+  try {
+    const doctors = await doctormodel.find();
+    const schedules : any = [];
+    
+    doctors.forEach((doctor) => {
+      const { schedule: doctorSchedules } = doctor;
+      schedules.push({ doctorSchedules });
+    });
+
+    res.json({ schedules });
+
+  } catch (error) {
+    res.status(400).send("error:" + error);
+  }
+}
+
+
+
+
+
+
+
+
 

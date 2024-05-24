@@ -6,7 +6,7 @@ import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
-import {AvailableTimeModel, scheduleModel} from "../models/reservations-utils";
+import {/*AvailableTimeModel,*/ IAvailableTime, ISchedule, /*scheduleModel*/} from "../models/reservations-utils";
 import crypto from "crypto";
 import  findByEmail  from "../utils/find-by-email";
 import { generate6Digits } from "../utils/generate-6-digits";
@@ -113,15 +113,18 @@ export const AddAvailableTime = async (req: Request, res: Response) => {
     const doctor = user.name;
     const reserved = "free";
     
-    const availableTime = new AvailableTimeModel({
-        day,
-        hour,
-        ticketNumber,
-        code,
-        doctor,
-        reserved
-    });
-          await availableTime.save();
+   // const availableTime = new AvailableTimeModel({
+    const availableTime: IAvailableTime = {
+      day,
+      hour,
+      ticketNumber,
+      code,
+      doctor,
+      reserved,
+      patient: "",
+      requestList: [],
+    };
+          //await availableTime.save();
           user!.available.push(availableTime);
           await user!.save();
           res.json({
@@ -294,7 +297,7 @@ export const deleteAllAvailableTimes = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send("Cannot find user to delete available times");
     user.available = [];
     await user.save();
-    await AvailableTimeModel.deleteMany({ doctor: user.name /*, reserved: "free"*/});
+    //await AvailableTimeModel.deleteMany({ doctor: user.name /*, reserved: "free"*/});
     res.json({ message: "all Available times deleted" });
   } catch (error) {
     res.status(400).send("Cannot delete available times" + error);
@@ -311,18 +314,18 @@ export const confirmReservation = async (req: Request, res: Response) => {
 
     const patient = await patientModel.findOne({ name: patientName });
     const doctor = await doctormodel.findById(req.user.id);
-    const availableTime = await AvailableTimeModel.findOne({ code });
+    //const availableTime = await AvailableTimeModel.findOne({ code });
     const rdvInDoctor = doctor!.available.find((time: any) => time.code === code);
     const rdvInPatient = patient!.reservationsRequests.find((time: any) => time.code === code);
     if (!patient) return res.status(400).send("Cannot find patient");
     if (!doctor) return res.status(400).send("Cannot find doctor");
-    if (!availableTime) return res.status(400).send("Cannot find available time");
-    if (availableTime.reserved === "reserved") return res.status(400).send("This time is already reserved");
+    //if (!availableTime) return res.status(400).send("Cannot find available time");
+    //if (availableTime.reserved === "reserved") return res.status(400).send("This time is already reserved");
 
-    availableTime.reserved = "reserved";
+    /*availableTime.reserved = "reserved";
     availableTime.patient = patientName;
     availableTime.requestList = [];
-    await availableTime.save();
+    await availableTime.save();*/
 
     rdvInDoctor!.reserved = "reserved";
     rdvInDoctor!.patient = patientName;
@@ -351,7 +354,7 @@ export const addSchedule = async (req: Request, res: Response) => {
     const user = await doctormodel.findById(id);
     if (!user) return res.status(400).send("Cannot find user to add schedule");
 
-    const schedule = new scheduleModel({
+    const schedule : ISchedule = ({
       day,
       start,
       end,
@@ -361,7 +364,7 @@ export const addSchedule = async (req: Request, res: Response) => {
     });
     user.schedule.push(schedule);
     await user.save();
-    await schedule.save();
+    //await scheduleModel.create(schedule);
 
 
 
@@ -376,7 +379,7 @@ function calculateTimeSlots( start: string, end: string, checkTime: number ): an
   let startTime = new Date(`1970-01-01T${start}`);
   const endTime = new Date(`1970-01-01T${end}`);
   const timeSlots = [];
-  let ticketNumber = 0;
+  let ticketNumber = 1;
 
 while (true) {
   timeSlots.push({
@@ -389,11 +392,6 @@ while (true) {
       break;
   startTime = new Date(startTime.getTime() + checkTime * 60000);
 }
-
-  /*while (startTime <= endTime) {
-    timeSlots.push(startTime.toISOString().substring(11, 16));
-    startTime.setMinutes(startTime.getMinutes() + checkTime);
-  }*/
   return timeSlots;
 }
 
@@ -407,7 +405,7 @@ export const deleteAllSchedule = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send("Cannot find user to delete schedule");
     user.schedule = [];
     await user.save();
-    await scheduleModel.deleteMany({ doctor: user.name });
+    //await scheduleModel.deleteMany({ doctor: user.name });
     res.json({ message: `all schedule deleted, thank you ${user.name}` });
   } catch (error) {
     res.status(400).send("Cannot delete schedule" + error);
@@ -416,23 +414,6 @@ export const deleteAllSchedule = async (req: Request, res: Response) => {
 
 //_______________________________________________________________________________________
 
-//modify schedule
-/*function calculateTimeSlots(
-  start: string,
-  end: string,
-  checkTime: number
-): string[] {
-  const startTime = new Date(`1970-01-01T${start}Z`);
-  const endTime = new Date(`1970-01-01T${end}Z`);
-  const timeSlots = [];
-
-  while (startTime < endTime) {
-    timeSlots.push(startTime.toISOString().substring(11, 16));
-    startTime.setMinutes(startTime.getMinutes() + checkTime);
-  }
-
-  return timeSlots;
-}*/
 
 
 
