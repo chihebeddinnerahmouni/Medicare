@@ -2,6 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import rateLimiter from 'express-rate-limit';
+import helmet from 'helmet';
+import cors from 'cors';
 
 
 dotenv.config();    
@@ -9,10 +12,37 @@ const app = express();
 
 const PORT = process.env.port;
 const DB = process.env.MONGO_URI;
-//midlwear
+
+// to use
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//security
+//rate limiter
+app.use(rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+}));
+//helmet
+/*app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "trusted-cdn.com"],
+    },
+  })
+);
+//helmet.js
+app.use(helmet());
+//cors
+const corsOptions = {
+  origin: "http://your-trusted-domain.com",
+};
+
+app.use(cors(corsOptions));*/
+
+
 
 //routes
 app.use('/admins', require('./routes/admin-routes'));
