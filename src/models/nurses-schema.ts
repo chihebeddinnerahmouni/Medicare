@@ -1,23 +1,20 @@
 import mongoose from 'mongoose';
 import { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { sign } from 'jsonwebtoken';
 import dotenv from 'dotenv';
-dotenv.config();
 import {
   AvailableTimeSchema,
   IAvailableTime,
 } from "./reservations-utils";
-
+dotenv.config();
 
 // Nurse interface
-export interface INurse extends Document {
+export interface INurse {
   name: string;
   specialite: string;
   phone: Number;
   password: string;
   email: string;
-  location: string;
   available: IAvailableTime[];
   verificationCode: String | undefined;
   verified: boolean;
@@ -30,31 +27,49 @@ export interface INurse extends Document {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
+  workStatus: "off" | "free" | "busy";
+  location: {
+    'type': string;
+    coordinates: number[];
+  };
 }
 
+
+
 // Doctor schema
-const nurseschema = new Schema<INurse>({
+const nurseSchema = new Schema<INurse>({
   name: { type: String, required: true, unique: true }, //
   specialite: { type: String, required: true },
   phone: { type: Number, required: true, unique: true }, //
   password: { type: String, required: true },
   email: { type: String, required: true, unique: true }, //
-  location: { type: String, required: true },
   available: { type: [AvailableTimeSchema], default: [] },
   verificationCode: { type: String },
   verified: { type: Boolean, default: false },
   type: { type: String, required: true },
-  demandingNewPassword: { type: String, default: false},
+  demandingNewPassword: { type: String, default: false },
   online: { type: Boolean, default: false },
   token: { type: String },
   refreshToken: { type: String },
   tokenVersion: { type: Number, default: 0 },
   profilePicture: { type: String },
   coverPicture: { type: String },
+  workStatus: { type: String, default: "off" },
+  location: {
+    'type': {
+      type: String, 
+      enum: ["Point"], 
+    },
+    coordinates: {
+      type: [Number],
+    },
+  }
 });
 
+nurseSchema.index({ location: "2dsphere" });
+
 //hashing password before saving
-nurseschema.pre('save', async function (next) {
+nurseSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
@@ -63,7 +78,7 @@ nurseschema.pre('save', async function (next) {
 
 
 //create a model for schema
-const nurseModel = mongoose.model<INurse>('nurse', nurseschema);
+const nurseModel = mongoose.model<INurse>('nurse', nurseSchema);
 
 //export model
 export default nurseModel;

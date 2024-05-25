@@ -1,17 +1,18 @@
 import express from "express";
 import {
-    getAllPatients,
-    deletePatient,
-    getPatientProfile,
-    updatePassword,
-    updatePatientProfile,
-    updatePatientEmail,
-    updatePatientProfilePicture,
-    updatePatientCoverPicture,
-    deleteAllRequests,
-    sendReservationRequest,
-    reserveScheduleTicket,
-    deleteAllScheduleReservations
+  getAllPatients,
+  deletePatient,
+  getPatientProfile,
+  updatePassword,
+  updatePatientProfile,
+  updatePatientEmail,
+  updatePatientProfilePicture,
+  updatePatientCoverPicture,
+  deleteAllRequests,
+  sendReservationRequest,
+  reserveScheduleTicket,
+  deleteAllScheduleReservations,
+  getNearbyNurses,
 } from "../controllers/patient-controllers";
 import authGuard from "../middlewear/authGuard";
 import adminAuthGuard from "../middlewear/admin-authGuard";
@@ -45,17 +46,22 @@ router.put("/profile/update-profile-picture", upload.single("PatProfPic"), authG
 //update cover pic
 router.put("/profile/update-cover-picture", upload.single("PatCoverPic"), authGuard, updatePatientCoverPicture)
 
-//delete all requests
+//delete all requests (doctors)
 router.put("/profile/delete-requests", authGuard, deleteAllRequests)
 
-//reservation request
+//reservation request (doctors)
 router.put("/profile/send-reservation-request", authGuard, sendReservationRequest);
 
-//reserve a schedule ticket
+//reserve a schedule ticket (doctors)
 router.put("/profile/reserve-ticket", authGuard, reserveScheduleTicket);
 
-//delete all schedule reservations
-router.put( "/profile/delete-schedule-reservations", authGuard, deleteAllScheduleReservations);
+//delete all schedule reservations (doctors)
+router.put("/profile/delete-schedule-reservations", authGuard, deleteAllScheduleReservations);
+
+//look for nearby nurses
+router.get("/profile/nearby-nurses", authGuard, getNearbyNurses);
+
+
 
 
 

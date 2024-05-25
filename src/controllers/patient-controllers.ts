@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import patientModel from "../models/patient-schema";
 import { Request, Response } from 'express';
@@ -16,6 +17,7 @@ import {
   IPatientScheduleReservation,
 } from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
+import nurseModel from '../models/nurses-schema';
 
 
 dotenv.config();
@@ -68,7 +70,7 @@ export const signupPatient = async (req: Request, res: Response) => {
 
 // get all patients
 export const getAllPatients = async (req: Request, res: Response) => {
-    try {
+  try {
         const patients = await patientModel.find();
         res.status(200).json(patients);
     } catch (error) {
@@ -392,8 +394,29 @@ await doctormodel.updateMany(
   }
 }
 
+//_____________________________________________________________________________________
 
+//get neaby nurses
+export const getNearbyNurses = async (req: Request, res: Response) => {
+  try {
+    const userLocation = req.body.userLocation;
 
+    const nearbyNurses = await nurseModel.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: userLocation
+          },
+          $maxDistance: 1000 //in meters
+        }
+      }
+    });
+     res.status(200).json(nearbyNurses);
+  } catch (error) {
+    res.status(400).send("Cannot get nearby nurses: " + error);
+  }
+}
 
 
 

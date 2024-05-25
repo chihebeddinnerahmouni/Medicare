@@ -7,7 +7,8 @@ import {
   updateNurseProfile,
   updateNurseEmail,
   updateNurseProfilePicture,
-  updateNurseCoverPicture
+  updateNurseCoverPicture,
+  statusToWork,
 } from "../controllers/nurses-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -19,7 +20,7 @@ const router = express.Router();
 router.get("/", getAllNurses);
 
 //delete a nurse
-router.delete("/delete/:name", deleteNurse);
+router.delete("/delete", deleteNurse);
 
 //nurse profile
 router.get("/profile", authGuard, getNurseProfile);
@@ -38,6 +39,9 @@ router.put("/profile/update-profile-picture", upload.single("NurProfPic"), authG
 
 //update cover pic
 router.put("/profile/update-cover-picture", upload.single("NurCoverPic"), authGuard, updateNurseCoverPicture)
+
+//change on work status 
+router.put("/profile/change-work-status", authGuard, statusToWork);
 
 
 

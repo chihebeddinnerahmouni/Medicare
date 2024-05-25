@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import rateLimiter from 'express-rate-limit';
 import helmet from 'helmet';
 import cors from 'cors';
+import nurseModel from './models/nurses-schema';
 
 
 dotenv.config();    
@@ -57,11 +58,26 @@ app.use('/', require('./routes/common-routes'));
 
 
 //connect to database
-mongoose.connect(DB!).then(() => {
-    console.log("Connected to MongoDB")
 
-    //delete unique index
-    /*mongoose.connection.collections["doctors"]
+  mongoose.connect(DB!).then(async () => {
+    console.log("Connected to MongoDB");
+
+  //await nurseModel.ensureIndexes();
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }).catch((err) => console.log(err));
+
+
+
+
+
+
+
+
+  //delete unique index
+  /*mongoose.connection.collections["nurses"]
       .dropIndex("location_1")
       .then(() => {
           console.log('Dropped index');
@@ -69,11 +85,7 @@ mongoose.connect(DB!).then(() => {
       .catch((err) => {
           console.log('Failed to drop index:', err);
       });*/
-    
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}).catch((err) => console.log(err));
 
-
-
+//check indexes
+      /*const indexes = await nurseModel.collection.getIndexes();
+        console.log(indexes);*/

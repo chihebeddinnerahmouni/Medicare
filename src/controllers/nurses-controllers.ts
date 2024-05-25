@@ -18,8 +18,8 @@ dotenv.config();
 // Signup nurse
 export const signupNurse = async (req: Request, res: Response) => {
     try {
-        const { name, email, phone, location, specialite, password } = req.body;
-      const fields = [name, email, phone, location, specialite, password];
+        const { name, email, phone, specialite, password } = req.body;
+      const fields = [name, email, phone, specialite, password];
               const type = "nurse";
 
         if (isFieldMissing(fields)) {
@@ -39,7 +39,6 @@ export const signupNurse = async (req: Request, res: Response) => {
             name,
             email,
             phone,
-            location,
             specialite,
             password,
             type,
@@ -57,7 +56,7 @@ export const signupNurse = async (req: Request, res: Response) => {
 
 //get all nurses
 export const getAllNurses = async (req: Request, res: Response) => {
-    try {
+  try {
         const nurses = await nurseModel.find();
         res.status(200).json(nurses);
     } catch (error) {
@@ -72,9 +71,10 @@ export const getAllNurses = async (req: Request, res: Response) => {
 //delete a nurse
 export const deleteNurse = async (req: Request, res: Response) => {
     try {
-        const name = req.params.name;
-        const nurse = await nurseModel.findOneAndDelete({ name });
-        res.status(200).send(nurse);
+        const name = req.query.name;
+      const nurse = await nurseModel.findOneAndDelete({ name });
+        if (!nurse) return res.status(404).send("Cannot find nurse to delete");
+        res.status(200).send("cbn merci");
     } catch (error) {
         res.status(400).json({ message: "Error deleting nurse", error: error });
     }
@@ -233,3 +233,39 @@ export const searchPatient = async (req: Request, res: Response) => {
     res.status(500).json({ message: "An error occurred while searching for doctors", error: error, });
   }
 };
+
+//______________________________________________________________________________________
+
+//change status to work
+export const statusToWork = async (req: Request, res: Response) => { 
+
+  try {
+    const id = req.user.id;
+    const { location } = req.body;
+    if (!location) return res.status(400).json({message: "Location is required"});
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse to change status to work");
+
+    user.workStatus = "free";
+user.location = {
+  type: "Point",
+  coordinates: location,
+};
+    await user.save();
+
+    res.json({ message: `Status changed to work, thank you ${user.name}` });
+  
+  } catch (error) {
+    res.send("error degat"+ error)
+  }
+}
+
+//______________________________________________________________________________________
+
+
+
+
+
+
+
+
