@@ -13,6 +13,9 @@ import  searchMedicalStaff  from "../middlewear/search-medical-staff";
 
 const router = express.Router();
 
+//walo
+router.get("/", (req, res) => { res.send("Welcome to the Health Care API") });
+
 //signup nurse
 router.post("/signup-nurse", signupNurse);
 

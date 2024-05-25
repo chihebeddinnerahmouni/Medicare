@@ -17,6 +17,7 @@ const DB = process.env.MONGO_URI;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors());
 
 //security
 //rate limiter

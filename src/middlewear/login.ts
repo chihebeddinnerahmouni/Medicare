@@ -11,27 +11,25 @@ export const login = async (req: Request, res: Response) => {
     const fields = [name, password];
     
     if (isFieldMissing(fields)) {
-        return res.status(400).send("All fields are required");
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
         const user = await findUser(name);
-        if (!user) return res.status(400).send("Invalid email or name");
+        if (!user) return res.status(400).json({ message: "invalid name" });
         
-        //if (!user.verified) return res.status(400).send(`${user.name}'s email not verified, verify`);
-        
-        const validation = await validatePassword(password, user.password);
-        if (!validation) return res.status(400).send("Invalid password");
-         
-        //if (user.online) return res.status(400).send("User already logged in");
+        const validation = await validatePassword(password, user!.password);
+        if (!validation) return res.status(400).json({ message: "invalid password" });
+      
+      //if (!user || !validation) return res.status(400).json({ message: "Invalid name or password" });
 
         const token = await generateToken(user, rememberMe);
         //const refreshToken = await generateRefreshToken(user);
             await updateUser(user, token);
-            res.json({ message: "Logged in successfully", token: token });
+            res.status(200).json({ message: "Logged in successfully", token: token });
         
     } catch (error) {
-        res.status(400).send("Error: " + error);
+      res.status(400).send("Error: " + error);
     }
 }
 
