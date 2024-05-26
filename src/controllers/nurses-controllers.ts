@@ -9,6 +9,12 @@ import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
 import fs from "fs";
 import patientModel from "../models/patient-schema";
+import { createClient } from "@google/maps";
+
+const googleMapsClient = createClient({
+  key: "your_google_maps_api_key",
+  Promise: Promise,
+});
 dotenv.config();
 
 
@@ -236,7 +242,7 @@ export const searchPatient = async (req: Request, res: Response) => {
 
 //______________________________________________________________________________________
 
-//change status to work
+//change status to work using geoJson
 export const statusToWork = async (req: Request, res: Response) => { 
 
   try {
@@ -262,10 +268,31 @@ user.location = {
 
 //______________________________________________________________________________________
 
+//get nearby nurses using google api
+/*export const statusToWork = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const { address } = req.body;
+    if (!address) return res.status(400).json({message: "Address is required"});
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find nurse to change status to work");
 
+    // Geocode the address
+    const response = await googleMapsClient.geocode({ address }).asPromise();
+    console.log(response.json.results[0]);
+    const location = response.json.results[0].geometry.location;
 
+    user.workStatus = "free";
+    user.address = address;
+    user.location = {
+      type: "Point",
+      coordinates: [location.lng, location.lat],
+    };
+    await user.save();
 
-
-
-
-
+    res.json({ message: `Status changed to work, thank you ${user.name}` });
+  
+  } catch (error) {
+    res.send("error degat"+ error)
+  }
+}*/

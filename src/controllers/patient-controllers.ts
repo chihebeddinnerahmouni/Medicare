@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import patientModel from "../models/patient-schema";
 import { Request, Response } from 'express';
@@ -15,6 +14,8 @@ import {
   //reservationRequestsModel,
   //AvailableTimeModel,
   IPatientScheduleReservation,
+  IDemndeNurseRaquest,
+  demandeNurseRaquestModel,
 } from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
 import nurseModel from '../models/nurses-schema';
@@ -400,6 +401,9 @@ await doctormodel.updateMany(
 export const getNearbyNurses = async (req: Request, res: Response) => {
   try {
     const userLocation = req.body.userLocation;
+    const id = req.user.id;
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find patient to get nearby nurses");
 
     const nearbyNurses = await nurseModel.find({
       location: {
@@ -412,14 +416,69 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         }
       }
     });
-     res.status(200).json(nearbyNurses);
+
+     let nurseList = [];
+    for (let nurse of nearbyNurses) {
+      const request: IDemndeNurseRaquest = {
+        patient: user.name,
+        nurse: nurse.name,
+        location: {
+          type: "Point",
+          coordinates: user.location.coordinates
+        },
+        accepted: false,
+        finished: false
+      };
+      
+      nurse.askingForNurseList.push(request);
+      await nurse.save();
+      nurseList.push(nurse.name);
+      }
+    res.json({ message: `requests sent to: ${nurseList}` });
+
+
   } catch (error) {
     res.status(400).send("Cannot get nearby nurses: " + error);
   }
 }
 
 
+//real time request
+/*import { Server } from 'socket.io';
+import DemandeNurseRaquest from '../models/DemandeNurseRaquest';
 
+// Create a new Socket.IO server
+const io = new Server();
+
+// Listen for connections
+io.on('connection', (socket) => {
+  // Listen for a 'subscribe' event, which is sent by the client when they want to subscribe to notifications for a nurse
+  socket.on('subscribe', (nurseId) => {
+    socket.join(nurseId);
+  });
+});
+
+// When a request is created, send a notification to the nurse
+const request = new DemandeNurseRaquest({
+  // ...
+});
+await request.save();
+io.to(request.nurse).emit('newRequest', request);
+
+// Endpoint to accept a request
+router.put('/requests/:requestId/accept', async (req, res) => {
+  try {
+    const request = await DemandeNurseRaquest.findById(req.params.requestId);
+    if (!request) {
+      return res.status(404).send('Request not found');
+    }
+    request.accepted = true;
+    await request.save();
+    res.json({ message: 'Request accepted' });
+  } catch (error) {
+    res.status(500).send('Error accepting request: ' + error);
+  }
+});*/
 
 
 

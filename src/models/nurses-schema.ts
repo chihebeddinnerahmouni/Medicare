@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import {
   AvailableTimeSchema,
   IAvailableTime,
+  IDemndeNurseRaquest,
+  demandeNurseRaquestSchema,
 } from "./reservations-utils";
 dotenv.config();
 
@@ -32,6 +34,13 @@ export interface INurse {
     'type': string;
     coordinates: number[];
   };
+  /* for google api
+  address: string;
+  location: {
+    type: string;
+    coordinates: number[];
+  };*/
+  askingForNurseList: IDemndeNurseRaquest[];
 }
 
 
@@ -63,7 +72,20 @@ const nurseSchema = new Schema<INurse>({
     coordinates: {
       type: [Number],
     },
-  }
+  },
+  /* for google api
+  address: { type: String },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number]
+    },
+  },*/
+  askingForNurseList: { type: [demandeNurseRaquestSchema], default: [] },
 });
 
 nurseSchema.index({ location: "2dsphere" });

@@ -135,7 +135,38 @@ export const patientScheduleReservationSchema = new Schema({
   phone: { type: Number },
   reseredAt: { type: String },
 },
-{ _id: false });
+  { _id: false });
+
+//______________________________________________________________________________________
+  
+// request for demanding home nurse
+export interface IDemndeNurseRaquest {
+  patient: string;
+  nurse: string;
+  location: {
+    type: string;
+    coordinates: number[];
+  };
+  accepted: boolean;
+  finished: boolean;
+}
+export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
+  patient: { type: String, required: true },
+  nurse: { type: String, required: true },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: {
+      type: [Number],
+    },
+  },
+  accepted: { type: Boolean, default: false },
+  finished: { type: Boolean, default: false},
+});
+
+export const demandeNurseRaquestModel = mongoose.model<IDemndeNurseRaquest>("demandeNurseRaquest", demandeNurseRaquestSchema);
 
 
 

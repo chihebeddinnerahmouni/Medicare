@@ -28,7 +28,11 @@ export interface IPatient extends Document {
   coverPicture: string;
   reservationsRequests: IReservationRequests[];
   scheduleResevations: IPatientScheduleReservation[];
-}
+  location: {
+    'type': string;
+    coordinates: number[];
+  };
+  }
 
 export const patientSchema = new Schema<IPatient>({
   name: { type: String, required: true, unique: true }, //
@@ -47,6 +51,15 @@ export const patientSchema = new Schema<IPatient>({
   coverPicture: { type: String },
   reservationsRequests: { type: [reservationRequestsSchema], default: [] },
   scheduleResevations: { type: [patientScheduleReservationSchema], default: [] },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: {
+      type: [Number],
+    },
+  },
 });
 
 patientSchema.pre("save", async function (next) {
@@ -59,3 +72,4 @@ patientSchema.pre("save", async function (next) {
 const patientModel = mongoose.model<IPatient>("patient", patientSchema);
 
 export default patientModel;
+
