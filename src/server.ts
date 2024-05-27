@@ -6,6 +6,7 @@ import rateLimiter from 'express-rate-limit';
 import helmet from 'helmet';
 import cors from 'cors';
 import nurseModel from './models/nurses-schema';
+import path from 'path';
 
 
 dotenv.config();    
@@ -19,6 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 
 //security
 //rate limiter

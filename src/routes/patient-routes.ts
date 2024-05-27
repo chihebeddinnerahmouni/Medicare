@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  getAllPatients,
   deletePatient,
   getPatientProfile,
   updatePassword,
@@ -21,9 +20,6 @@ import upload from "../utils/multer-configs-to-images";
 
 const router = express.Router();
 
-
-//get all patients
-router.get("/",adminAuthGuard, getAllPatients);
 
 //delete a patient
 router.delete("/:name", deletePatient);

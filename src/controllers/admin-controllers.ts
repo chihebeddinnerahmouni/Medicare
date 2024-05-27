@@ -9,6 +9,8 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import doctormodel from "../models/doctor-schema";
+import patientModel from "../models/patient-schema";
+
 dotenv.config();
 
 
@@ -143,7 +145,29 @@ export const getDoctorSchedules = async (req: Request, res: Response) => {
   }
 }
 
+//_______________________________________________________________________________________
 
+//delete all doctors
+export const deleteAllDoctors = async (req: Request, res: Response) => {
+  try {
+    await doctormodel.deleteMany();
+    res.json({ message: "All doctors deleted" });
+  } catch (error) {
+    res.status(400).send("error:" + error);
+  }
+}
+
+//_______________________________________________________________________________________
+
+// get all patients
+export const getAllPatients = async (req: Request, res: Response) => {
+  try {
+        const patients = await patientModel.find();
+        res.status(200).json(patients);
+    } catch (error) {
+         res.json({ message: 'degat mlginahomch', error: error });
+    }
+}
 
 
 

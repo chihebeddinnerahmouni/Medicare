@@ -27,6 +27,10 @@ export interface IDoctor extends Document {
   profilePicture: string;
   coverPicture: string;
   schedule: ISchedule[];
+  avgRating: number;
+  totalRating: number;
+  totalpatients: number;
+  hospital: string;
 };
 
 
@@ -51,7 +55,11 @@ const doctorschema = new Schema<IDoctor>({
   profilePicture: { type: String },
   coverPicture: { type: String },
   //schedule: { type: Schema.Types.ObjectId, ref: "schedule" },
-  schedule: { type: [scheduleSchema], default: []},
+  schedule: { type: [scheduleSchema], default: [] },
+  avgRating: { type: Number, default: 0 },
+  totalRating: { type: Number, default: 0 },
+  totalpatients: { type: Number, default: 0 },
+  hospital: { type: String, default: "bilar" },
 });
 
 

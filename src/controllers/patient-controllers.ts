@@ -69,20 +69,6 @@ export const signupPatient = async (req: Request, res: Response) => {
 //______________________________________________________________________________________
 
 
-// get all patients
-export const getAllPatients = async (req: Request, res: Response) => {
-  try {
-        const patients = await patientModel.find();
-        res.status(200).json(patients);
-    } catch (error) {
-         res.json({ message: 'degat mlginahomch', error: error });
-    }
-}
-
-
-//______________________________________________________________________________________
-
-
 //delete a patient
 export const deletePatient = async (req: Request, res: Response) => {
     try {

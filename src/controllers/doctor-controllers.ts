@@ -262,7 +262,7 @@ async function updatePicture(
 
   if (user[pictureField]) {
     fs.unlink(user[pictureField], (err) => {
-      if (err) console.error(`Failed to delete old picture at ${user[pictureField]}: `,err);
+      if (err) console.error(`Failed to delete old picture at ${user[pictureField]}: `, err);
     });
   }
 
@@ -270,7 +270,7 @@ async function updatePicture(
   await user.save();
   res
     .status(200)
-    .json({ message: `${pictureField} updated successfully`, file: req.file! });
+    .json({ message: `${pictureField} updated successfully, thank you ${user.name}`, file: req.file! });
 }
 
 //______________________________________________________________________________________

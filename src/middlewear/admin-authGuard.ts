@@ -3,6 +3,13 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import adminModel from "../models/admin-schema";
 dotenv.config();
+declare global {
+  namespace Express {
+    interface Request {
+      user: any; // or the actual type of your user
+    }
+  }
+}
 
 const adminAuthGuard = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;

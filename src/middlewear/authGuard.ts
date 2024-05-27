@@ -3,7 +3,13 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import findUserById from "../utils/find-user-by-id-and-type";
 dotenv.config();
-
+declare global {
+  namespace Express {
+    interface Request {
+      user: any; // or the actual type of your user
+    }
+  }
+}
 
 const authGuard = async (
   req: Request,
@@ -18,9 +24,8 @@ const authGuard = async (
     jwt.verify(token, process.env.secret_key!, async (err: any, payload: any) => {
       
       if (err) {
-        if (err.name === 'TokenExpiredError') {
-          return res.status(401).json({ message: 'token expires' });
-        }
+        if (err.name === 'TokenExpiredError') return res.status(401).json({ message: 'token expires' });
+        
         return res.status(401).json({ message: 'Invalid token', error: err });
       } 
 
