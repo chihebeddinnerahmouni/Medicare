@@ -29,7 +29,12 @@ const handleExistingUser = async (
 ) => {
   const existingUser = await checkExistingUser(res, email, name, phone);
   if (existingUser) {
-    res.status(400).send("User already exists" + existingUser);
+    res
+      .status(400)
+      .json({
+        message:
+          "User already exists",
+      });
     return true;
   }
   return false;

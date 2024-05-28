@@ -37,7 +37,7 @@ export const signupPatient = async (req: Request, res: Response) => {
     const fields = [name, email, phone, password];
     const type = "patient";
     if (isFieldMissing(fields)) {
-      return res.status(400).send("All fields are required");
+      return res.status(400).json({message: "All fields are required"});
     }
 
     if (!handlePasswordStrength(res, password)) {

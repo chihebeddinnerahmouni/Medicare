@@ -7,19 +7,19 @@ import jwt from "jsonwebtoken";
 import isFieldMissing from "../utils/is-missing-field";
 
 export const login = async (req: Request, res: Response) => {
-    const { name, password, rememberMe } = req.body;
-    const fields = [name, password];
+    const { identifier, password, rememberMe } = req.body;
+    const fields = [identifier, password];
     
     if (isFieldMissing(fields)) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        const user = await findUser(name);
-        if (!user) return res.status(400).json({ message: "invalid name" });
+        const user = await findUser(identifier);
+        if (!user) return res.status(400).json({ message: "invalid name/email or password, please check your informations and try again" });
         
         const validation = await validatePassword(password, user!.password);
-        if (!validation) return res.status(400).json({ message: "invalid password" });
+        if (!validation) return res.status(400).json({ message:"invalid name/email or password, please check your informations and try again",});
       
       //if (!user || !validation) return res.status(400).json({ message: "Invalid name or password" });
 
@@ -40,11 +40,13 @@ export const login = async (req: Request, res: Response) => {
 
 
 
-async function findUser(name: string) {
+async function findUser(identifier: string) {
     const [doctor, patient, nurse] = await Promise.all([
-        doctormodel.findOne({ name }),
-        patientModel.findOne({ name }),
-        nurseModel.findOne({ name }),
+      doctormodel.findOne({ $or: [{ name: identifier }, {email: identifier }] }),
+      patientModel.findOne({
+        $or: [{ name: identifier }, {email: identifier }],
+      }),
+      nurseModel.findOne({ $or: [{ name: identifier }, {email: identifier }] }),
     ]);
     return doctor || patient || nurse;
 }
