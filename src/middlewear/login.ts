@@ -26,7 +26,7 @@ export const login = async (req: Request, res: Response) => {
         const token = await generateToken(user, rememberMe);
         //const refreshToken = await generateRefreshToken(user);
             await updateUser(user, token);
-            res.status(200).json({ message: "Logged in successfully", token: token });
+            res.status(200).json({ message: "Logged in successfully", token: token, user: user });
         
     } catch (error) {
       res.status(400).send("Error: " + error);

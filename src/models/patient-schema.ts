@@ -13,7 +13,7 @@ dotenv.config();
 
 export interface IPatient extends Document {
   name: string;
-  phone: Number;
+  phone: number;
   email: string;
   password: string;
   verificationCode: String | undefined;

@@ -95,7 +95,7 @@ export const getNurseProfile = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
     const user = await nurseModel.findById(id);
-    if (!user) return res.status(400).send("Cannot find nurse profile");
+    if (!user) return res.status(400).json({message: "Cannot find nurse profile"});
       const resUser = {
         name: user.name,
         email: user.email,
@@ -103,7 +103,7 @@ export const getNurseProfile = async (req: Request, res: Response) => {
         location: user.location,
         specialite: user.specialite
       }
-    res.json(resUser);
+    res.json(user);
   } catch (error) { 
     res.send("error degat"+ error)
   }
@@ -250,7 +250,7 @@ export const statusToWork = async (req: Request, res: Response) => {
     const { location } = req.body;
     if (!location) return res.status(400).json({message: "Location is required"});
     const user = await nurseModel.findById(id);
-    if (!user) return res.status(400).send("Cannot find nurse to change status to work");
+    if (!user) return res.status(400).json({message: "Cannot find nurse to change status to work"});
 
     user.workStatus = "free";
 user.location = {
@@ -267,6 +267,48 @@ user.location = {
 }
 
 //______________________________________________________________________________________
+
+//delete all patient requests
+export const deleteAllPatientRequests = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to delete all requests" });
+    
+    user.patientRequests = [];
+    await user.save();
+    res.json({ message: `All patient requests deleted, thank you ${user.name}` });
+
+
+
+
+  } catch (error) {
+    res.send("error degat" + error);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //get nearby nurses using google api
 /*export const statusToWork = async (req: Request, res: Response) => { 

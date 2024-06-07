@@ -9,6 +9,7 @@ import {
   updateNurseProfilePicture,
   updateNurseCoverPicture,
   statusToWork,
+  deleteAllPatientRequests,
 } from "../controllers/nurses-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -42,6 +43,9 @@ router.put("/profile/update-cover-picture", upload.single("NurCoverPic"), authGu
 
 //change on work status 
 router.put("/profile/change-work-status", authGuard, statusToWork);
+
+//delete all patient requests
+router.put("/profile/delete-all-requests", authGuard, deleteAllPatientRequests);
 
 
 

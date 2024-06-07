@@ -95,7 +95,7 @@ export const getPatientProfile = async (req: Request, res: Response) => {
         email: user.email,
         phone: user.phone
       }
-    res.json(resUser);
+    res.json(user);
   } catch (error) { 
     res.send("error degat"+ error)
   }
@@ -327,16 +327,16 @@ export const reserveScheduleTicket = async (req: Request, res: Response) => {
     const doctorr = await doctormodel.findOne({ name: doctor });
     if (!doctorr) return res.status(400).send("Cannot find doctor to reserve schedule ticket");
 
-    let schedule = doctorr.schedule.find((time: any) => time.day === day);
+    let schedule: any = doctorr.schedule.find((time: any) => time.day === day);
     if (!schedule) return res.status(400).send("Cannot find schedule to reserve schedule ticket");
 
-    let freeSlot = schedule.freeAt.find((slot: any) => slot.reserved === "free");
+    let freeSlot: any = schedule.freeAt.find((slot: any) => slot.reserved === "free");
     if (!freeSlot) return res.status(400).send("Cannot find free slot to reserve schedule ticket");
 
     freeSlot.reserved = "true";
-    freeSlot.patient = patient.name;
+    freeSlot.patientName = patient.name;
+    freeSlot.patientPhone = patient.phone;
     await doctorr.save();
-
     const scheduleReservation: IPatientScheduleReservation = {
       day: schedule.day,
       hour: freeSlot.hour,
@@ -391,6 +391,8 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
     const user = await patientModel.findById(id);
     if (!user) return res.status(400).send("Cannot find patient to get nearby nurses");
 
+    user.location.coordinates = userLocation;
+
     const nearbyNurses = await nurseModel.find({
       location: {
         $near: {
@@ -416,7 +418,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         finished: false
       };
       
-      nurse.askingForNurseList.push(request);
+      nurse.patientRequests.push(request);
       await nurse.save();
       nurseList.push(nurse.name);
       }

@@ -31,7 +31,7 @@ export interface INurse {
   coverPicture: string;
   workStatus: "off" | "free" | "busy";
   location: {
-    'type': string;
+    type: string;
     coordinates: number[];
   };
   /* for google api
@@ -40,7 +40,7 @@ export interface INurse {
     type: string;
     coordinates: number[];
   };*/
-  askingForNurseList: IDemndeNurseRaquest[];
+  patientRequests: IDemndeNurseRaquest[];
 }
 
 
@@ -85,7 +85,7 @@ const nurseSchema = new Schema<INurse>({
       type: [Number]
     },
   },*/
-  askingForNurseList: { type: [demandeNurseRaquestSchema], default: [] },
+  patientRequests: { type: [demandeNurseRaquestSchema], default: [] },
 });
 
 nurseSchema.index({ location: "2dsphere" });

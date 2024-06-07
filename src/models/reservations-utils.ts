@@ -77,16 +77,20 @@ export interface IScheduleDate {
   hour: string;
   ticketNumber: number;
   reserved: string;
-  patient: string;
+  patientName: string;
   patientPhone: number;
+  patientProfilePicture: string;
+
 }
 const scheduleDateSchema = new Schema(
   {
     hour: { type: String, required: true },
     ticketNumber: { type: Number, required: true },
     reserved: { type: String, required: true, default: "free" },
-    patient: { type: String },
+    patientName: { type: String },
     patientPhone: { type: Number },
+    patientProfilePicture: { type: String }
+
   },
   { _id: false }
 );
@@ -105,7 +109,7 @@ export const scheduleSchema = new Schema({
   day: { type: String, required: true },
   start: { type: String, required: true },
   end: { type: String, required: true },
-  checkTime: { type: Number, required: true },
+  checkTime: { type: Number, required: true, default: 20},
   doctor: { type: String },
   freeAt: { type: [scheduleDateSchema] },
 }, { _id: false });

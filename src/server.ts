@@ -5,8 +5,10 @@ import cookieParser from 'cookie-parser';
 import rateLimiter from 'express-rate-limit';
 import helmet from 'helmet';
 import cors from 'cors';
-import nurseModel from './models/nurses-schema';
 import path from 'path';
+import http from "http"; 
+import socketIo from "socket.io";
+import { Server } from "socket.io";
 
 
 dotenv.config();    
@@ -25,10 +27,12 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 //security
 //rate limiter
-app.use(rateLimiter({
+/*app.use(
+  rateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
-}));
+    max: 100, // limit each IP to 100 requests per windowMs
+  })
+);*/
 //helmet
 /*app.use(
   helmet.contentSecurityPolicy({
@@ -58,19 +62,20 @@ app.use('/', require('./routes/common-routes'));
 
 
 
-
+const server = http.createServer(app);
+const io = new Server(server);
 
 //connect to database
 
-  mongoose.connect(DB!).then(async () => {
+mongoose
+  .connect(DB!)
+  .then(async () => {
     console.log("Connected to MongoDB");
-
-  //await nurseModel.ensureIndexes();
-
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
-  }).catch((err) => console.log(err));
+  })
+  .catch((err) => console.log(err));
 
 
 

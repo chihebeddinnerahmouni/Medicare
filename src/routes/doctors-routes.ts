@@ -14,6 +14,7 @@ import {
   confirmReservation,
   addSchedule,
   deleteAllSchedule,
+  getAllSchedules
 } from "../controllers/doctor-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -63,6 +64,11 @@ router.put("/profile/add-schedule", authGuard, addSchedule);
 
 //delete all schedule
 router.put("/profile/delete-all-schedules", authGuard, deleteAllSchedule);
+
+//get All schedules
+router.get("/profile/schedules", authGuard, getAllSchedules);
+
+
 
 
 

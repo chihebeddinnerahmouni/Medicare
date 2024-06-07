@@ -144,7 +144,7 @@ export const getDoctorProfile = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
     const doctor = await doctormodel.findById(id);
-    if (!doctor) return res.status(345).send("Cannot find doctor profile");
+    if (!doctor) return res.status(400).json({ message: "Cannot find doctor" });
     const resDoctor = {
       name: doctor.name,
       email: doctor.email,
@@ -152,10 +152,10 @@ export const getDoctorProfile = async (req: Request, res: Response) => {
       location: doctor.location,
       specialite: doctor.specialite,
     };
-    res.json(resDoctor);
+    res.json(doctor);
   } catch (error) {
-    res.send("error degat" + error);
-  }
+    res.status(400).json({message: "Cannot get doctor profile", error: error });
+  };
 };
 
 
@@ -350,6 +350,8 @@ export const addSchedule = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
     const { day, start, end, checkTime } = req.body;
+    const fields = [day, start, end, checkTime];
+    if (isFieldMissing(fields)) return res.status(400).json({ message: "All fields are required"});
 
     const user = await doctormodel.findById(id);
     if (!user) return res.status(400).send("Cannot find user to add schedule");
@@ -371,25 +373,27 @@ export const addSchedule = async (req: Request, res: Response) => {
 
     res.json({ message: `Schedule added, thank you ${user.name}`, doctor: user });
   } catch (error) {
-    res.status(400).send("Cannot add schedule" + error);
+    res.status(400).json({ message:"Cannot add schedule" , error: error });
   }
 }
 
-function calculateTimeSlots( start: string, end: string, checkTime: number ): any[] {
+function calculateTimeSlots(start: string, end: string, checkTime: number): any[] {
+  console.log("1");
   let startTime = new Date(`1970-01-01T${start}`);
   const endTime = new Date(`1970-01-01T${end}`);
+  console.log("2");
   const timeSlots = [];
   let ticketNumber = 1;
 
 while (true) {
   timeSlots.push({
     hour: startTime.toISOString().substring(11, 16),
-    ticketNumber: ticketNumber++,});
+    ticketNumber: ticketNumber++,
+  });
     if (
       startTime.getHours() === endTime.getHours() &&
       startTime.getMinutes() === endTime.getMinutes()
-    )
-      break;
+  ) break;
   startTime = new Date(startTime.getTime() + checkTime * 60000);
 }
   return timeSlots;
@@ -415,7 +419,21 @@ export const deleteAllSchedule = async (req: Request, res: Response) => {
 //_______________________________________________________________________________________
 
 
+//get All schedules
+export const getAllSchedules = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await doctormodel.findById(id);
+    if (!user) return res.status(400).send("Cannot find user to get schedules");
+    const data = user.schedule;
+    res.status(200).json({message:`shedules for ${user.name}`, data: data });
 
+
+
+  } catch (error) {
+    res.status(400).send("Cannot get schedules" + error);
+  }
+}
 
 
 
