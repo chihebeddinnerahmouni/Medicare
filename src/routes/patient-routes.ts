@@ -12,6 +12,7 @@ import {
   reserveScheduleTicket,
   deleteAllScheduleReservations,
   getNearbyNurses,
+  resetPatient,
 } from "../controllers/patient-controllers";
 import authGuard from "../middlewear/authGuard";
 import adminAuthGuard from "../middlewear/admin-authGuard";
@@ -56,6 +57,9 @@ router.put("/profile/delete-schedule-reservations", authGuard, deleteAllSchedule
 
 //look for nearby nurses
 router.get("/profile/nearby-nurses", authGuard, getNearbyNurses);
+
+//reset patient
+router.put("/profile/reset-patient", authGuard, resetPatient);
 
 
 

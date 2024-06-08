@@ -32,6 +32,9 @@ export interface IPatient extends Document {
     'type': string;
     coordinates: number[];
   };
+  patientStatus: boolean | "pending";
+  requestTo: Array<string>;
+  serviceNurse: string;
   }
 
 export const patientSchema = new Schema<IPatient>({
@@ -50,7 +53,10 @@ export const patientSchema = new Schema<IPatient>({
   profilePicture: { type: String },
   coverPicture: { type: String },
   reservationsRequests: { type: [reservationRequestsSchema], default: [] },
-  scheduleResevations: { type: [patientScheduleReservationSchema], default: [] },
+  scheduleResevations: {
+    type: [patientScheduleReservationSchema],
+    default: [],
+  },
   location: {
     type: {
       type: String,
@@ -60,6 +66,9 @@ export const patientSchema = new Schema<IPatient>({
       type: [Number],
     },
   },
+  patientStatus: { type: mongoose.Schema.Types.Mixed, default: false },
+  requestTo: { type: [String], default: [] },
+  serviceNurse: { type: String, default: ""},
 });
 
 patientSchema.pre("save", async function (next) {

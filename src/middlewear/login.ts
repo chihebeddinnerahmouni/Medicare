@@ -63,8 +63,7 @@ async function generateToken(user: any, rememberMe: boolean) {
       type: user.type,
       tokenVersion: user.tokenVersion,
     },
-    process.env.secret_key!,
-    { expiresIn }
+    process.env.secret_key!
   );
 }
 async function generateRefreshToken(user: any) {

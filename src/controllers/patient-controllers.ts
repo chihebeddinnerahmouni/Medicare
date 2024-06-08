@@ -393,80 +393,83 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
 
     user.location.coordinates = userLocation;
 
+    if (user.patientStatus === "pending")
+      return res
+        .status(400)
+        .json({
+          message: `You already sent requests thank you ${user.name} wli mb3d`,
+        });
+
     const nearbyNurses = await nurseModel.find({
+      workStatus: "free",
       location: {
         $near: {
           $geometry: {
             type: "Point",
-            coordinates: userLocation
+            coordinates: userLocation,
           },
-          $maxDistance: 1000 //in meters
-        }
-      }
+          $maxDistance: 1000, //in meters
+        },
+      },
     });
 
-     let nurseList = [];
+    let nurseList = [];
+    for (let nurse of nearbyNurses) {
+      nurseList.push(nurse.name);
+      nurse.workStatus = "pending"
+    }
+
     for (let nurse of nearbyNurses) {
       const request: IDemndeNurseRaquest = {
         patient: user.name,
         nurse: nurse.name,
         location: {
           type: "Point",
-          coordinates: user.location.coordinates
+          coordinates: userLocation,
         },
-        accepted: false,
-        finished: false
+        status: "pending",
+        nursesRequested: nurseList,
       };
       
       nurse.patientRequests.push(request);
       await nurse.save();
-      nurseList.push(nurse.name);
-      }
-    res.json({ message: `requests sent to: ${nurseList}` });
+    }
+      if (nurseList.length === 0)
+        return res.status(400).json({ message: "Cannot find nearby nurses" });
+    
+    user.patientStatus = "pending";
+    user.requestTo = nurseList;
+    await user.save();
+    res.json({ message: `thank you ${user.name}, requests sent to: ${nurseList}` });
 
 
   } catch (error) {
-    res.status(400).send("Cannot get nearby nurses: " + error);
+    res.status(400).json({message:"Cannot get nearby nurses: ","error": error});
   }
 }
 
+//_____________________________________________________________________________________
 
-//real time request
-/*import { Server } from 'socket.io';
-import DemandeNurseRaquest from '../models/DemandeNurseRaquest';
-
-// Create a new Socket.IO server
-const io = new Server();
-
-// Listen for connections
-io.on('connection', (socket) => {
-  // Listen for a 'subscribe' event, which is sent by the client when they want to subscribe to notifications for a nurse
-  socket.on('subscribe', (nurseId) => {
-    socket.join(nurseId);
-  });
-});
-
-// When a request is created, send a notification to the nurse
-const request = new DemandeNurseRaquest({
-  // ...
-});
-await request.save();
-io.to(request.nurse).emit('newRequest', request);
-
-// Endpoint to accept a request
-router.put('/requests/:requestId/accept', async (req, res) => {
+//reset patient
+export const resetPatient = async (req: Request, res: Response) => {
   try {
-    const request = await DemandeNurseRaquest.findById(req.params.requestId);
-    if (!request) {
-      return res.status(404).send('Request not found');
-    }
-    request.accepted = true;
-    await request.save();
-    res.json({ message: 'Request accepted' });
+    const id = req.user.id;
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).send("Cannot find patient to reset");
+    user.patientStatus = false;
+    user.requestTo = [];
+    user.serviceNurse = ""
+    await user.save();
+    res.json({ message: `thank you ${user.name}, reseted successfully` });
+
+
+
+
   } catch (error) {
-    res.status(500).send('Error accepting request: ' + error);
+    res.send("error degat" + error)
   }
-});*/
+}
+
 
 
 

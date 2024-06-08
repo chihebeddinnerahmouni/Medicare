@@ -29,7 +29,7 @@ export interface INurse {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
-  workStatus: "off" | "free" | "busy";
+  workStatus: "off" | "free" | "busy" | "pending";
   location: {
     type: string;
     coordinates: number[];
@@ -65,9 +65,9 @@ const nurseSchema = new Schema<INurse>({
   coverPicture: { type: String },
   workStatus: { type: String, default: "off" },
   location: {
-    'type': {
-      type: String, 
-      enum: ["Point"], 
+    type: {
+      type: String,
+      enum: ["Point"],
     },
     coordinates: {
       type: [Number],

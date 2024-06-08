@@ -151,8 +151,8 @@ export interface IDemndeNurseRaquest {
     type: string;
     coordinates: number[];
   };
-  accepted: boolean;
-  finished: boolean;
+  status: "pending" | "accepted" | "rejected";
+  nursesRequested: string[];
 }
 export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
   patient: { type: String, required: true },
@@ -166,8 +166,8 @@ export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
       type: [Number],
     },
   },
-  accepted: { type: Boolean, default: false },
-  finished: { type: Boolean, default: false},
+  status: { type: String, default: "pending" },
+  nursesRequested: { type: [String], default: []},
 });
 
 export const demandeNurseRaquestModel = mongoose.model<IDemndeNurseRaquest>("demandeNurseRaquest", demandeNurseRaquestSchema);

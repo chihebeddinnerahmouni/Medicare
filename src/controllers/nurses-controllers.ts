@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import nurseModel from "../models/nurses-schema";
+import patientModel from "../models/patient-schema";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import handlePasswordStrength from "../utils/check-password-strength";
@@ -8,7 +9,6 @@ import handleExistingUser from "../utils/check-execisting-user-phemna";
 import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
 import fs from "fs";
-import patientModel from "../models/patient-schema";
 import { createClient } from "@google/maps";
 
 const googleMapsClient = createClient({
@@ -268,73 +268,114 @@ user.location = {
 
 //______________________________________________________________________________________
 
-//delete all patient requests
-export const deleteAllPatientRequests = async (req: Request, res: Response) => {
+//delete a patient request
+export const refusePatientRequests = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
+    //const patientName = req.body.patientName;
+
     const user = await nurseModel.findById(id);
-    if (!user) return res.status(400).json({ message: "Cannot find nurse to delete all requests" });
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to delete a request" });
+    //const patient = await patientModel.findOne({ name: patientName });
+    //if (!patient) return res.status(400).json({ message: "Cannot find patient" });
     
+
     user.patientRequests = [];
+    user.workStatus = "free";
     await user.save();
-    res.json({ message: `All patient requests deleted, thank you ${user.name}` });
-
-
-
-
+    res.json({ message: `Patient request deleted, thank you ${user.name}` });
   } catch (error) {
     res.send("error degat" + error);
   }
 };
 
+//______________________________________________________________________________________
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//get nearby nurses using google api
-/*export const statusToWork = async (req: Request, res: Response) => { 
+//accept a patient request
+export const acceptPatientRequests = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
-    const { address } = req.body;
-    if (!address) return res.status(400).json({message: "Address is required"});
     const user = await nurseModel.findById(id);
-    if (!user) return res.status(400).send("Cannot find nurse to change status to work");
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to accept a request" });
+    const patientName = user.patientRequests[0].patient;
+    const patient = await patientModel.findOne({ name: patientName });
+    if (!patient) return res.status(400).json({ message: "Cannot find patient" });
 
-    // Geocode the address
-    const response = await googleMapsClient.geocode({ address }).asPromise();
-    console.log(response.json.results[0]);
-    const location = response.json.results[0].geometry.location;
+    const nursesList = user.patientRequests[0].nursesRequested; 
 
-    user.workStatus = "free";
-    user.address = address;
-    user.location = {
-      type: "Point",
-      coordinates: [location.lng, location.lat],
-    };
+    for (let nur of nursesList) { 
+      if (nur === user.name) continue;
+      const nurse = await nurseModel.findOne({ name: nur });
+      nurse!.patientRequests = [];
+      nurse!.workStatus = "free";
+      await nurse!.save();
+    }
+    user.patientRequests[0].status = "accepted";
+    user.workStatus = "busy";
+    patient.patientStatus = true;
+    patient.requestTo = [];
+    patient.serviceNurse = user.name;
     await user.save();
+    await patient.save();
+    res.json({message: `you accept the request of ${patientName}, thank you ${user!.name}`});
 
-    res.json({ message: `Status changed to work, thank you ${user.name}` });
-  
+
+
   } catch (error) {
-    res.send("error degat"+ error)
+    res.json({ message: "error degat " + error })
   }
-}*/
+};
+
+//______________________________________________________________________________________
+
+//finish the nurse
+export const serviveEnd = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to finish the service" });
+    const patientName = user.patientRequests[0].patient;
+    const patient = await patientModel.findOne({ name: patientName });
+    if (!patient) return res.status(400).json({ message: "Cannot find patient" });
+
+    user.patientRequests = [];
+    user.workStatus = "free";
+    patient.patientStatus = false;
+    patient.serviceNurse = "";
+    patient.requestTo = [];
+    await user.save();
+    await patient.save();
+    res.json({ message: `Service ended with ${patientName}, thank you ${user.name}` });
+
+
+
+
+
+
+
+  } catch (error) {
+    res.json({ message: "error degat", error: error })
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
