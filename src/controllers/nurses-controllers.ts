@@ -346,13 +346,6 @@ export const serviveEnd = async (req: Request, res: Response) => {
     await user.save();
     await patient.save();
     res.json({ message: `Service ended with ${patientName}, thank you ${user.name}` });
-
-
-
-
-
-
-
   } catch (error) {
     res.json({ message: "error degat", error: error })
   }

@@ -147,16 +147,26 @@ export const patientScheduleReservationSchema = new Schema({
 export interface IDemndeNurseRaquest {
   patient: string;
   nurse: string;
+  status: "pending" | "accepted" | "rejected";
+  nursesRequested: string[];
+  price: number;
+  service: string,
+  patientRate: number,
+  distance: number,
   location: {
     type: string;
     coordinates: number[];
   };
-  status: "pending" | "accepted" | "rejected";
-  nursesRequested: string[];
 }
 export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
   patient: { type: String, required: true },
   nurse: { type: String, required: true },
+  status: { type: String, default: "pending" },
+  nursesRequested: { type: [String], default: [] },
+  price: { type: Number },
+  service: { type: String },
+  patientRate: { type: Number },
+  distance: {type:Number},
   location: {
     type: {
       type: String,
@@ -166,8 +176,6 @@ export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
       type: [Number],
     },
   },
-  status: { type: String, default: "pending" },
-  nursesRequested: { type: [String], default: []},
 });
 
 export const demandeNurseRaquestModel = mongoose.model<IDemndeNurseRaquest>("demandeNurseRaquest", demandeNurseRaquestSchema);

@@ -423,12 +423,16 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
       const request: IDemndeNurseRaquest = {
         patient: user.name,
         nurse: nurse.name,
+        status: "pending",
+        nursesRequested: nurseList,
+        price: 500, //
+        service: "Yodhrb bra f wjho",//
+        patientRate: 4.5,//
+        distance: 2.6, //
         location: {
           type: "Point",
           coordinates: userLocation,
         },
-        status: "pending",
-        nursesRequested: nurseList,
       };
       
       nurse.patientRequests.push(request);

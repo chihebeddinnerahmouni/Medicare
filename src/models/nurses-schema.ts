@@ -29,7 +29,7 @@ export interface INurse {
   tokenVersion: number;
   profilePicture: string;
   coverPicture: string;
-  workStatus: "off" | "free" | "busy" | "pending";
+  workStatus: "off" | "free" | "pending" | "busy";
   location: {
     type: string;
     coordinates: number[];
