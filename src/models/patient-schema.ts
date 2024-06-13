@@ -6,6 +6,8 @@ import {
   reservationRequestsSchema,
   IPatientScheduleReservation,
   patientScheduleReservationSchema,
+  IDemndeNurseRaquest,
+  demandeNurseRaquestSchema,
 } from "./reservations-utils";
 
 dotenv.config();
@@ -33,6 +35,7 @@ export interface IPatient extends Document {
     coordinates: number[];
   };
   patientStatus: boolean | "pending";
+  nurseRequest: any;
   requestTo: Array<string>;
   serviceNurse: string;
   }
@@ -57,6 +60,10 @@ export const patientSchema = new Schema<IPatient>({
     type: [patientScheduleReservationSchema],
     default: [],
   },
+  patientStatus: { type: mongoose.Schema.Types.Mixed, default: false },
+  nurseRequest: { type: mongoose.Schema.Types.Mixed, default: {} },
+  requestTo: { type: [String], default: [] },
+  serviceNurse: { type: String, default: "" },
   location: {
     type: {
       type: String,
@@ -66,9 +73,6 @@ export const patientSchema = new Schema<IPatient>({
       type: [Number],
     },
   },
-  patientStatus: { type: mongoose.Schema.Types.Mixed, default: false },
-  requestTo: { type: [String], default: [] },
-  serviceNurse: { type: String, default: ""},
 });
 
 patientSchema.pre("save", async function (next) {

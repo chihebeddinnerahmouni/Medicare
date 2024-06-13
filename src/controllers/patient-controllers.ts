@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import patientModel from "../models/patient-schema";
-import { Request, Response } from 'express';
+import { Request, Response, request } from 'express';
 import handlePasswordStrength from "../utils/check-password-strength";
 import isFieldMissing from "../utils/is-missing-field";
 import handleExistingUser from "../utils/check-execisting-user-phemna";
@@ -19,6 +19,7 @@ import {
 } from "../models/reservations-utils";
 import doctormodel from '../models/doctor-schema';
 import nurseModel from '../models/nurses-schema';
+import { Id } from '@turf/turf';
 
 
 dotenv.config();
@@ -386,10 +387,14 @@ await doctormodel.updateMany(
 //get neaby nurses
 export const getNearbyNurses = async (req: Request, res: Response) => {
   try {
-    const userLocation = req.body.userLocation;
+    const { userLocation, service, subService } = req.body;
+
     const id = req.user.id;
     const user = await patientModel.findById(id);
     if (!user) return res.status(400).send("Cannot find patient to get nearby nurses");
+    const fields = [userLocation, service, subService];
+    if (isFieldMissing(fields)) return res.status(400).send("All fields are required");
+   
 
     user.location.coordinates = userLocation;
 
@@ -414,8 +419,17 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
     });
 
     let nurseList = [];
+    let nurseListNames = [];
     for (let nurse of nearbyNurses) {
-      nurseList.push(nurse.name);
+      const nurseInfos = {
+        nurseName: nurse.name,
+        nurseRate: 4.5, //
+        nurseLikes: 80, //
+        nurseSpecialite: nurse.specialite,
+        patientClients: 90//
+      };
+      nurseListNames.push(nurse.name)
+      nurseList.push(nurseInfos);
       nurse.workStatus = "pending"
     }
 
@@ -424,9 +438,10 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         patient: user.name,
         nurse: nurse.name,
         status: "pending",
-        nursesRequested: nurseList,
+        nursesRequested: nurseListNames,
         price: 500, //
-        service: "Yodhrb bra f wjho",//
+        service: service,
+        subService: subService,
         patientRate: 4.5,//
         distance: 2.6, //
         location: {
@@ -439,16 +454,29 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
       await nurse.save();
     }
       if (nurseList.length === 0)
-        return res.status(400).json({ message: "Cannot find nearby nurses" });
+        return res.status(201).json({ message: "Cannot find nearby nurses" });
     
+    const UserRequest = {
+      patient: user.name,
+      status: "pending",
+      nursesRequested: nurseList,
+      price: 500, //
+      service: service,
+      subService: subService,
+    };
     user.patientStatus = "pending";
-    user.requestTo = nurseList;
+    user.nurseRequest = UserRequest;
+
+
     await user.save();
-    res.json({ message: `thank you ${user.name}, requests sent to: ${nurseList}` });
+    return res.status(200).json({ message: `thank you ${user.name}`, nurseList});
 
 
   } catch (error) {
-    res.status(400).json({message:"Cannot get nearby nurses: ","error": error});
+    
+
+  console.error(error);
+    res.status(400).json({message:"degat Cannot get nearby nurses: ","error": error});
   }
 }
 
@@ -465,10 +493,6 @@ export const resetPatient = async (req: Request, res: Response) => {
     user.serviceNurse = ""
     await user.save();
     res.json({ message: `thank you ${user.name}, reseted successfully` });
-
-
-
-
   } catch (error) {
     res.send("error degat" + error)
   }

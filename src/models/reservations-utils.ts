@@ -151,6 +151,7 @@ export interface IDemndeNurseRaquest {
   nursesRequested: string[];
   price: number;
   service: string,
+  subService: string,
   patientRate: number,
   distance: number,
   location: {
@@ -165,6 +166,7 @@ export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
   nursesRequested: { type: [String], default: [] },
   price: { type: Number },
   service: { type: String },
+  subService: { type: String },
   patientRate: { type: Number },
   distance: {type:Number},
   location: {

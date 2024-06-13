@@ -56,7 +56,7 @@ router.put("/profile/reserve-ticket", authGuard, reserveScheduleTicket);
 router.put("/profile/delete-schedule-reservations", authGuard, deleteAllScheduleReservations);
 
 //look for nearby nurses
-router.get("/profile/nearby-nurses", authGuard, getNearbyNurses);
+router.post("/profile/nearby-nurses", authGuard, getNearbyNurses);
 
 //reset patient
 router.put("/profile/reset-patient", authGuard, resetPatient);

@@ -329,7 +329,7 @@ export const acceptPatientRequests = async (req: Request, res: Response) => {
 //______________________________________________________________________________________
 
 //finish the nurse
-export const serviveEnd = async (req: Request, res: Response) => {
+export const serviceEnd = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
     const user = await nurseModel.findById(id);
@@ -342,7 +342,8 @@ export const serviveEnd = async (req: Request, res: Response) => {
     user.workStatus = "free";
     patient.patientStatus = false;
     patient.serviceNurse = "";
-    patient.requestTo = [];
+    //patient.requestTo = [];
+    patient.nurseRequest = [];
     await user.save();
     await patient.save();
     res.json({ message: `Service ended with ${patientName}, thank you ${user.name}` });
