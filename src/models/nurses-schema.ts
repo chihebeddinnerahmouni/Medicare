@@ -30,17 +30,16 @@ export interface INurse {
   profilePicture: string;
   coverPicture: string;
   workStatus: "off" | "free" | "pending" | "busy";
+  patientRequests: IDemndeNurseRaquest[];
+  ratingNumber: number;
+  ratingSum: number;
+  patientClients: number;
+  averageRating: number;
+  patientComments: object[];
   location: {
     type: string;
     coordinates: number[];
   };
-  /* for google api
-  address: string;
-  location: {
-    type: string;
-    coordinates: number[];
-  };*/
-  patientRequests: IDemndeNurseRaquest[];
 }
 
 
@@ -64,6 +63,12 @@ const nurseSchema = new Schema<INurse>({
   profilePicture: { type: String },
   coverPicture: { type: String },
   workStatus: { type: String, default: "off" },
+  patientRequests: { type: [demandeNurseRaquestSchema], default: [] },
+  ratingNumber: { type: Number, default: 0 },
+  ratingSum: { type: Number, default: 0 },
+  averageRating: { type: Number, default: 0 },
+  patientClients: { type: Number, default: 0 },
+  patientComments: { type: [Object], default: [] },
   location: {
     type: {
       type: String,
@@ -73,19 +78,6 @@ const nurseSchema = new Schema<INurse>({
       type: [Number],
     },
   },
-  /* for google api
-  address: { type: String },
-  location: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point",
-    },
-    coordinates: {
-      type: [Number]
-    },
-  },*/
-  patientRequests: { type: [demandeNurseRaquestSchema], default: [] },
 });
 
 nurseSchema.index({ location: "2dsphere" });

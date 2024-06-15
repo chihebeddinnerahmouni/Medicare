@@ -398,12 +398,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
 
     user.location.coordinates = userLocation;
 
-    if (user.patientStatus === "pending")
-      return res
-        .status(400)
-        .json({
-          message: `You already sent requests thank you ${user.name} wli mb3d`,
-        });
+    if (user.patientStatus === "pending") return res.status(400).json({message: `You already sent requests thank you ${user.name} wli mb3d`,});
 
     const nearbyNurses = await nurseModel.find({
       workStatus: "free",
@@ -423,7 +418,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
     for (let nurse of nearbyNurses) {
       const nurseInfos = {
         nurseName: nurse.name,
-        nurseRate: 4.5, //
+        nurseRate: nurse.averageRating,
         nurseLikes: 80, //
         nurseSpecialite: nurse.specialite,
         patientClients: 90//
@@ -498,7 +493,42 @@ export const resetPatient = async (req: Request, res: Response) => {
   }
 }
 
+//_____________________________________________________________________________________
 
+// rate a nurse
+export const rateNurse = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const { rating, comment, nurseName } = req.body;
+    const user = await nurseModel.findOne({ name: nurseName });
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to rate" });
+
+    if (rating !== 0) {
+      const oldRatingNumber = user.ratingNumber;
+      const oldRatingSum = user.ratingSum;
+      const newRatingNumber = oldRatingNumber + 1;
+      const newRatingSum = oldRatingSum + rating;
+      const newAverageRating = (newRatingSum / newRatingNumber).toFixed(1);
+      user.ratingNumber = newRatingNumber;
+      user.ratingSum = newRatingSum;
+      user.averageRating = Number(newAverageRating);
+      await user.save();
+    }
+
+    if (comment !== "") {
+      const commentObj = {
+        patient: user.name,
+        comment: comment,
+      };
+      user.patientComments.push(commentObj);
+      await user.save();
+    }
+
+    res.status(200).json({ message: `You rated ${nurseName} with ${rating} stars` });
+  } catch (error) { 
+    res.status(400).json({ message: "Error rating nurse", error: error });
+  }
+}
 
 
 

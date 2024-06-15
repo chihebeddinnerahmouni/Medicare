@@ -65,8 +65,21 @@ app.use('/', require('./routes/common-routes'));
 const server = http.createServer(app);
 const io = new Server(server);
 
-//connect to database
+io.on("connection", (socket) => {
+  console.log("New client connected");
 
+  socket.on("requestAccepted", (data) => {
+    // Broadcast the event to all clients
+    io.sockets.emit("requestAccepted", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
+
+//connect to databaseconst 
 mongoose
   .connect(DB!)
   .then(async () => {
