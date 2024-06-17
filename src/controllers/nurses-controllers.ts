@@ -10,11 +10,6 @@ import sendinSignupEmail from "../utils/sending-Signup-email";
 import findByEmail from "../utils/find-by-email";
 import fs from "fs";
 import { createClient } from "@google/maps";
-
-const googleMapsClient = createClient({
-  key: "your_google_maps_api_key",
-  Promise: Promise,
-});
 dotenv.config();
 
 
@@ -272,14 +267,8 @@ export const statusToWork = async (req: Request, res: Response) => {
 export const refusePatientRequests = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
-    //const patientName = req.body.patientName;
-
     const user = await nurseModel.findById(id);
     if (!user) return res.status(400).json({ message: "Cannot find nurse to delete a request" });
-    //const patient = await patientModel.findOne({ name: patientName });
-    //if (!patient) return res.status(400).json({ message: "Cannot find patient" });
-    
-
     user.patientRequests = [];
     user.workStatus = "free";
     await user.save();
@@ -342,10 +331,11 @@ export const serviceEnd = async (req: Request, res: Response) => {
 
     user.patientRequests = [];
     user.workStatus = "free";
+    user.patientClients += 1;
     patient.patientStatus = false;
     //patient.nurseRequest.serviceNurse = "";
     //patient.requestTo = [];
-    patient.nurseRequest = [];
+    patient.nurseRequest = {};
     await user.save();
     await patient.save();
     res.json({ message: `Service ended with ${patientName}, thank you ${user.name}` });
@@ -390,7 +380,46 @@ export const statusToNotWork = async (req: Request, res: Response) => {
   }
 }
 
+//______________________________________________________________________________________
 
+//rate a patient
+export const ratePatient = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const { rating, patientName, comment } = req.body;
+
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to rate a patient" });
+    const patient = await patientModel.findOne({ name: patientName });
+    if (!patient)return res.status(400).json({ message: "Cannot find patient" });
+
+    if (rating !== 0) {
+      const oldRatingNumber = patient.ratingNumber;
+      const oldRatingSum = patient.ratingSum;
+      const newRatingNumber = oldRatingNumber + 1;
+      const newRatingSum = oldRatingSum + rating;
+      const newAverageRating = (newRatingSum / newRatingNumber).toFixed(1);
+      patient.ratingNumber = newRatingNumber;
+      patient.ratingSum = newRatingSum;
+      patient.averageRating = Number(newAverageRating);
+      await patient.save();
+    }
+
+    if (comment !== "") {
+      const commentObj = {
+        nurse: user.name,
+        comment: comment,
+      };
+      patient.comments.push(commentObj);
+      await patient.save();
+    }
+
+    res.status(200).json({ message: `Patient ${patientName} rated successfully, thank you ${user.name}` });
+
+  } catch (error) {
+    res.status(400).json({ message: "error degat", error: error });
+  }
+};
 
 
 

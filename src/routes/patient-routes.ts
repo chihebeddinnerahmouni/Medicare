@@ -13,7 +13,9 @@ import {
   deleteAllScheduleReservations,
   getNearbyNurses,
   resetPatient,
-  rateNurse
+  rateNurse,
+  chooseNurse,
+  refuseNurse,
 } from "../controllers/patient-controllers";
 import authGuard from "../middlewear/authGuard";
 import adminAuthGuard from "../middlewear/admin-authGuard";
@@ -64,6 +66,12 @@ router.put("/profile/reset-patient", authGuard, resetPatient);
 
 // rate a nurse
 router.put("/profile/rate-nurse", authGuard, rateNurse);
+
+//refuse accepted nurse
+router.put("/profile/refuse-nurse", authGuard, refuseNurse);
+
+//choose another nurse
+router.put("/profile/choose-nurse", authGuard, chooseNurse);
 
 
 

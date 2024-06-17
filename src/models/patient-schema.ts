@@ -31,14 +31,18 @@ export interface IPatient extends Document {
   reservationsRequests: IReservationRequests[];
   scheduleResevations: IPatientScheduleReservation[];
   location: {
-    'type': string;
+    type: string;
     coordinates: number[];
   };
   patientStatus: boolean | "pending";
   nurseRequest: any;
   requestTo: Array<string>;
+  ratingNumber: number;
+  ratingSum: number;
+  averageRating: number;
+  comments: Array<object>;
   //serviceNurse: string;
-  }
+}
 
 export const patientSchema = new Schema<IPatient>({
   name: { type: String, required: true, unique: true }, //
@@ -56,14 +60,15 @@ export const patientSchema = new Schema<IPatient>({
   profilePicture: { type: String },
   coverPicture: { type: String },
   reservationsRequests: { type: [reservationRequestsSchema], default: [] },
-  scheduleResevations: {
-    type: [patientScheduleReservationSchema],
-    default: [],
-  },
+  scheduleResevations: {type: [patientScheduleReservationSchema],default: [],},
   patientStatus: { type: mongoose.Schema.Types.Mixed, default: false },
   nurseRequest: { type: mongoose.Schema.Types.Mixed, default: {} },
   requestTo: { type: [String], default: [] },
   //serviceNurse: { type: String, default: "" },
+  ratingNumber: { type: Number, default: 0 },
+  ratingSum: { type: Number, default: 0 },
+  averageRating: { type: Number, default: 0 },
+  comments: { type: [Object], default: [] },
   location: {
     type: {
       type: String,

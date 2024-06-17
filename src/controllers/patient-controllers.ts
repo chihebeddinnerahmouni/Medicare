@@ -437,7 +437,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         price: 500, //
         service: service,
         subService: subService,
-        patientRate: 4.5,//
+        patientRate: user.averageRating,
         distance: 2.6, //
         location: {
           type: "Point",
@@ -485,7 +485,7 @@ export const resetPatient = async (req: Request, res: Response) => {
     const user = await patientModel.findById(id);
     if (!user) return res.status(400).send("Cannot find patient to reset");
     user.patientStatus = false;
-    user.requestTo = [];
+    //user.requestTo = [];
     //user.serviceNurse = "";
     user.nurseRequest = {};
     await user.save();
@@ -525,13 +525,105 @@ export const rateNurse = async (req: Request, res: Response) => {
       user.patientComments.push(commentObj);
       await user.save();
     }
-
     res.status(200).json({ message: `You rated ${nurseName} with ${rating} stars` });
   } catch (error) { 
     res.status(400).json({ message: "Error rating nurse", error: error });
   }
 }
 
+//_____________________________________________________________________________________
+
+//refuse a nurse
+export const refuseNurse = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find patient to refuse nurse" });
+    const nurseName = user.nurseRequest.serviceNurse;
+    const nurse = await nurseModel.findOne({ name: nurseName });
+    if (!nurse) return res.status(400).json({ message: "Cannot find nurse to refuse" });
+
+    user.patientStatus = false;
+    user.nurseRequest = {};
+    nurse.workStatus = "free";
+    nurse.patientRequests = [];
+    await user.save();
+    await nurse.save();
+    res.status(200).json({ message: `You refused ${nurseName}` });
+
+
+
+
+  } catch (error) { 
+    res.status(400).json({ message: "degat Error refusing nurse", error: error });
+  }
+};
+
+//_____________________________________________________________________________________
+
+//choose a nurse
+export const chooseNurse = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const { nurseName, service, subService, userLocation } = req.body;
+    
+    const fields = [nurseName, service, subService, userLocation];
+    if (isFieldMissing(fields)) return res.status(400).json({ message: "All fields are required" });
+    const user = await patientModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find patient to choose nurse" });
+    const nurse = await nurseModel.findOne({ name: nurseName });
+    if (!nurse) return res.status(400).json({ message: "Cannot find nurse to choose" });
+   
+
+    if (nurse.workStatus !== "free") return res.status(201).json({ message: `${nurse.name} is not available any more, please choose another one` });
+
+    const request: IDemndeNurseRaquest = {
+      patient: user.name,
+      nurse: nurseName,
+      status: "pending",
+      nursesRequested: [nurseName],
+      price: 500, //
+      service: service,
+      subService: subService,
+      patientRate: user.averageRating,
+      distance: 2.6, //
+      location: {
+        type: "Point",
+        coordinates: userLocation,
+      },
+    };
+    nurse.patientRequests.push(request);
+    nurse.workStatus = "pending";
+
+        const UserRequest = {
+          patient: user.name,
+          status: "pending",
+          nursesRequested: [
+            {
+              nurseName: nurseName,
+              nurseRate: nurse.averageRating,
+              nurseLikes: 80,//
+              nurseSpecialite: nurse.specialite,
+              patientClients: 90,//
+            },
+          ],
+          price: 500, //
+          service: service,
+          subService: subService,
+          serviceNurse: "",
+        };
+        user.patientStatus = "pending";
+        user.nurseRequest = UserRequest;
+    await user.save();
+    await nurse.save();
+    res.status(200).json({ message: `Request sent to ${nurseName} successfully, please wait for him to accept` });
+
+
+
+  } catch (error) { 
+    res.status(400).json({ message: "Error degat choosing nurse", error: error });
+  }
+}
 
 
 
