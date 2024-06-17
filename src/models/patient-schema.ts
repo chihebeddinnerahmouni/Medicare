@@ -37,7 +37,7 @@ export interface IPatient extends Document {
   patientStatus: boolean | "pending";
   nurseRequest: any;
   requestTo: Array<string>;
-  serviceNurse: string;
+  //serviceNurse: string;
   }
 
 export const patientSchema = new Schema<IPatient>({
@@ -63,7 +63,7 @@ export const patientSchema = new Schema<IPatient>({
   patientStatus: { type: mongoose.Schema.Types.Mixed, default: false },
   nurseRequest: { type: mongoose.Schema.Types.Mixed, default: {} },
   requestTo: { type: [String], default: [] },
-  serviceNurse: { type: String, default: "" },
+  //serviceNurse: { type: String, default: "" },
   location: {
     type: {
       type: String,

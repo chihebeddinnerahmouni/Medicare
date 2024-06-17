@@ -458,6 +458,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
       price: 500, //
       service: service,
       subService: subService,
+      serviceNurse: "",
     };
     user.patientStatus = "pending";
     user.nurseRequest = UserRequest;
@@ -485,7 +486,8 @@ export const resetPatient = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send("Cannot find patient to reset");
     user.patientStatus = false;
     user.requestTo = [];
-    user.serviceNurse = ""
+    //user.serviceNurse = "";
+    user.nurseRequest = {};
     await user.save();
     res.json({ message: `thank you ${user.name}, reseted successfully` });
   } catch (error) {

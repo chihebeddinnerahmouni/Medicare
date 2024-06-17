@@ -253,7 +253,7 @@ export const statusToWork = async (req: Request, res: Response) => {
     if (!user) return res.status(400).json({message: "Cannot find nurse to change status to work"});
 
     user.workStatus = "free";
-user.location = {
+    user.location = {
   type: "Point",
   coordinates: location,
 };
@@ -314,7 +314,9 @@ export const acceptPatientRequests = async (req: Request, res: Response) => {
     user.workStatus = "busy";
     patient.patientStatus = true;
     patient.requestTo = [];
-    patient.serviceNurse = user.name;
+    patient.nurseRequest.serviceNurse = user.name;
+    patient.nurseRequest.status = "accepted";
+    patient.markModified("nurseRequest");
     await user.save();
     await patient.save();
     res.json({message: `you accept the request of ${patientName}, thank you ${user!.name}`});
@@ -341,7 +343,7 @@ export const serviceEnd = async (req: Request, res: Response) => {
     user.patientRequests = [];
     user.workStatus = "free";
     patient.patientStatus = false;
-    patient.serviceNurse = "";
+    //patient.nurseRequest.serviceNurse = "";
     //patient.requestTo = [];
     patient.nurseRequest = [];
     await user.save();
@@ -354,8 +356,39 @@ export const serviceEnd = async (req: Request, res: Response) => {
 
 //______________________________________________________________________________________
 
+//get request
+export const getRequest = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to get request" });
+    const request = user.patientRequests;
+    res.status(200).send(request);
 
 
+
+  } catch (error) { 
+    res.status(400).json({ message: "error degat", error: error });
+  }
+}
+
+//______________________________________________________________________________________
+
+//change status to not working
+export const statusToNotWork = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to change status to not work" });
+    user.workStatus = "off";
+    await user.save();
+    res.json({ message: `now u r out, thank you ${user.name}` });
+
+
+  } catch (error) { 
+    res.status(400).json({message: "error degat", error })
+  }
+}
 
 
 

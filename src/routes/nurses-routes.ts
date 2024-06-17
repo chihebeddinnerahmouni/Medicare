@@ -12,6 +12,8 @@ import {
   refusePatientRequests,
   acceptPatientRequests,
   serviceEnd,
+  getRequest,
+  statusToNotWork,
 } from "../controllers/nurses-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -55,9 +57,11 @@ router.put("/profile/accept-request", authGuard, acceptPatientRequests);
 // finish the nurse
 router.put("/profile/service-end", authGuard, serviceEnd);
 
+// get request
+router.get("/profile/get-request", authGuard, getRequest);
 
-
-
+//change status to not working
+router.put("/profile/change-not-working", authGuard, statusToNotWork);
 
 
 
