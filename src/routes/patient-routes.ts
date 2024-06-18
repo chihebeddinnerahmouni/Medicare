@@ -2,9 +2,10 @@ import express from "express";
 import {
   deletePatient,
   getPatientProfile,
-  updatePassword,
+  resetPassword,
   updatePatientProfile,
   updatePatientEmail,
+  updatePassword,
   updatePatientProfilePicture,
   updatePatientCoverPicture,
   deleteAllRequests,
@@ -31,14 +32,17 @@ router.delete("/:name", deletePatient);
 //patient profile
 router.get("/profile", authGuard, getPatientProfile);
 
-//update password
-router.put("/profile/update-password", authGuard, updatePassword);
+//reset password
+router.put("/profile/reset-password", authGuard, resetPassword);
 
 //update profile
 router.put("/profile/update-profile", authGuard, updatePatientProfile);
 
 //update email
 router.put("/profile/update-email", authGuard, updatePatientEmail);
+
+//update password
+router.put("/profile/update-password", authGuard, updatePassword);
 
 //update profile pic
 router.put("/profile/update-profile-picture", upload.single("PatProfPic"), authGuard, updatePatientProfilePicture)

@@ -15,6 +15,7 @@ import {
   getRequest,
   statusToNotWork,
   ratePatient,
+  resetNurse,
 } from "../controllers/nurses-controllers";
 import authGuard from "../middlewear/authGuard";
 import upload from "../utils/multer-configs-to-images";
@@ -66,6 +67,9 @@ router.put("/profile/change-not-working", authGuard, statusToNotWork);
 
 //rate a patient
 router.put("/profile/rate-patient", authGuard, ratePatient);
+
+//reset nurse
+router.put("/profile/reset-nurse", authGuard, resetNurse);
 
 
 

@@ -154,6 +154,7 @@ export interface IDemndeNurseRaquest {
   subService: string,
   patientRate: number,
   distance: number,
+  choosen: boolean,
   location: {
     type: string;
     coordinates: number[];
@@ -168,7 +169,8 @@ export const demandeNurseRaquestSchema = new Schema<IDemndeNurseRaquest>({
   service: { type: String },
   subService: { type: String },
   patientRate: { type: Number },
-  distance: {type:Number},
+  distance: { type: Number },
+  choosen: { type: Boolean },
   location: {
     type: {
       type: String,

@@ -20,6 +20,7 @@ import {
 import doctormodel from '../models/doctor-schema';
 import nurseModel from '../models/nurses-schema';
 import { Id } from '@turf/turf';
+import bcrypt from 'bcrypt';
 
 
 dotenv.config();
@@ -107,18 +108,20 @@ export const getPatientProfile = async (req: Request, res: Response) => {
 
 
 //update password
-export const updatePassword = async (req: Request, res: Response) => { 
+export const resetPassword = async (req: Request, res: Response) => {
   try {
     const id = req.user.id;
     const { password } = req.body;
     if (!handlePasswordStrength(res, password)) return;
     const user = await patientModel.findById(id);
-    if (!user) return res.status(400).send("Cannot find patient to reset password");
+    if (!user)return res.status(400).json({ message: "Cannot find patient to reset password" });
+    //const isMatch = await bcrypt.compare(oldPassword, user.password);
+    //if (!isMatch) return res.status(201).json({ message: "your password is incorrect" });
     user.password = password;
     await user.save();
-    res.json({ message: "Password updated" });
+    res.status(200).json({ message: "Password updated" });
   } catch (error) {
-    res.send("error degat"+ error)
+    res.send("error degat" + error);
   }
 };
 
@@ -170,6 +173,26 @@ export const updatePatientEmail = async (req: Request, res: Response) => {
     await user.save();
   } catch (err) {
     res.send("error" + err);
+  }
+}
+
+//______________________________________________________________________________________
+
+//update password
+export const updatePassword = async (req: Request, res: Response) => { 
+  try {
+    const id = req.user.id;
+    const { oldPassword, newPassword } = req.body;
+    const user = await patientModel.findById(id);
+    if (!user)return res.status(401).json({ message: "Cannot find patient to reset password" });
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(201).json({ message: "your password is incorrect" });
+    if (!handlePasswordStrength(res, newPassword)) return;
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({ message: "Password updated" });
+  } catch (error) {
+    res.status(400).json({ message: "something went wrong", error: error });
   }
 }
 
@@ -415,13 +438,16 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
 
     let nurseList = [];
     let nurseListNames = [];
+    let pricee = 499;
     for (let nurse of nearbyNurses) {
+      pricee = pricee + 1;
       const nurseInfos = {
         nurseName: nurse.name,
         nurseRate: nurse.averageRating,
         nurseLikes: 80, //
         nurseSpecialite: nurse.specialite,
-        patientClients: 90//
+        patientClients: 90,//
+        price: pricee, //
       };
       nurseListNames.push(nurse.name)
       nurseList.push(nurseInfos);
@@ -439,6 +465,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         subService: subService,
         patientRate: user.averageRating,
         distance: 2.6, //
+        choosen: false,
         location: {
           type: "Point",
           coordinates: userLocation,
@@ -587,6 +614,7 @@ export const chooseNurse = async (req: Request, res: Response) => {
       subService: subService,
       patientRate: user.averageRating,
       distance: 2.6, //
+      choosen: true,
       location: {
         type: "Point",
         coordinates: userLocation,

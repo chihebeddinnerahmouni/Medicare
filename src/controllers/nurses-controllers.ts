@@ -269,10 +269,26 @@ export const refusePatientRequests = async (req: Request, res: Response) => {
     const id = req.user.id;
     const user = await nurseModel.findById(id);
     if (!user) return res.status(400).json({ message: "Cannot find nurse to delete a request" });
-    user.patientRequests = [];
-    user.workStatus = "free";
-    await user.save();
-    res.json({ message: `Patient request deleted, thank you ${user.name}` });
+    const choosen  = user.patientRequests[0].choosen; 
+
+
+    if (!choosen) {
+      user.patientRequests = [];
+      user.workStatus = "free";
+      await user.save();
+      return res.status(200).json({ message: `Patient request deleted, thank you ${user.name}` });
+    } else {
+      const patientName = user.patientRequests[0].patient;
+      const patient = await patientModel.findOne({ name: patientName });
+      if (!patient) return res.status(400).json({ message: "Cannot find patient" });
+      patient.patientStatus = false;
+      patient.nurseRequest = {};
+      user.patientRequests = [];
+      user.workStatus = "free";
+      await user.save();
+      await patient.save();
+      return res.status(200).json({ message: `${patient.name} request deleted after he chooses youuu!, thank you ${user.name}` }); 
+    }
   } catch (error) {
     res.send("error degat" + error);
   }
@@ -295,6 +311,8 @@ export const acceptPatientRequests = async (req: Request, res: Response) => {
     for (let nur of nursesList) { 
       if (nur === user.name) continue;
       const nurse = await nurseModel.findOne({ name: nur });
+      if (!nurse) return res.status(400).json({ message: `Cannot find ${nur}` });
+      if (nurse.workStatus === "pending" && nurse.patientRequests[0].patient !== patientName) continue;
       nurse!.patientRequests = [];
       nurse!.workStatus = "free";
       await nurse!.save();
@@ -391,7 +409,7 @@ export const ratePatient = async (req: Request, res: Response) => {
     const user = await nurseModel.findById(id);
     if (!user) return res.status(400).json({ message: "Cannot find nurse to rate a patient" });
     const patient = await patientModel.findOne({ name: patientName });
-    if (!patient)return res.status(400).json({ message: "Cannot find patient" });
+    if (!patient) return res.status(400).json({ message: "Cannot find patient" });
 
     if (rating !== 0) {
       const oldRatingNumber = patient.ratingNumber;
@@ -418,8 +436,26 @@ export const ratePatient = async (req: Request, res: Response) => {
 
   } catch (error) {
     res.status(400).json({ message: "error degat", error: error });
-  }
-};
+  };
+}
+
+//______________________________________________________________________________________
+
+//reset nurse
+export const resetNurse = async (req: Request, res: Response) => {
+  try {
+    const id = req.user.id;
+    const user = await nurseModel.findById(id);
+    if (!user) return res.status(400).json({ message: "Cannot find nurse to reset" });
+    user.patientRequests = [];
+    user.workStatus = "free";
+    await user.save();
+    res.status(200).json({ message: `Nurse ${user.name} reset successfully` });
+
+  } catch (error) {
+    res.status(400).json({ message: "error degat", error: error });
+   }
+}
 
 
 
