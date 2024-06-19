@@ -31,6 +31,17 @@ export const ioEvents = (io: Server, socket: Socket) => {
     io.to(room).emit("newRequest", "u have recievd a new request");
   });
     
+    //accepting the request
+    socket.on("acceptRequest", (patient, nurseData) => {
+        for (let [id, socket] of io.sockets.sockets) {
+            const namedSocket = socket as Socket;
+            if (namedSocket.name === patient) {
+                io.to(socket.id).emit("requestAccepted", nurseData);
+                break;
+            } 
+        }
+    });
+    
     
     
     
