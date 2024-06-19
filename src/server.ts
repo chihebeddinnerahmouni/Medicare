@@ -9,6 +9,7 @@ import path from 'path';
 import http from "http"; 
 import socketIo from "socket.io";
 import { Server } from "socket.io";
+import { ioEvents } from './ioEvents';
 
 
 dotenv.config();    
@@ -63,20 +64,19 @@ app.use('/', require('./routes/common-routes'));
 
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST"], // Allow GET and POST requests
+  },
+});
+
 
 io.on("connection", (socket) => {
-  console.log("New client connected");
-
-  socket.on("requestAccepted", (data) => {
-    // Broadcast the event to all clients
-    io.sockets.emit("requestAccepted", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
+  console.log("Client connected");
+  ioEvents(io, socket);
 });
+
 
 
 //connect to databaseconst 
