@@ -423,6 +423,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
 
     if (user.patientStatus === "pending") return res.status(400).json({message: `You already sent requests thank you ${user.name} wli mb3d`,});
 
+        //get nearbynurses
     const nearbyNurses = await nurseModel.find({
       workStatus: "free",
       location: {
@@ -436,6 +437,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
       },
     });
 
+        //
     let nurseList = [];
     let nurseListNames = [];
     let pricee = 499;
@@ -475,8 +477,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
       nurse.patientRequests.push(request);
       await nurse.save();
     }
-      if (nurseList.length === 0)
-        return res.status(201).json({ message: "Cannot find nearby nurses" });
+      if (nurseList.length === 0) return res.status(201).json({ message: "Cannot find nearby nurses" });
     
     const UserRequest = {
       patient: user.name,
@@ -489,10 +490,19 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
     };
     user.patientStatus = "pending";
     user.nurseRequest = UserRequest;
-
-
     await user.save();
-    return res.status(200).json({ message: `thank you ${user.name}`, nurseList});
+
+    const requestData = {  
+      service: service,
+      subService: subService,
+      distance: 2.6, //
+      price: 500, //
+      patient: user.name,
+      patientRate: user.averageRating,
+      location: userLocation,
+    };
+
+    return res.status(200).json({ message: `thank you ${user.name}`, nurseList, requestData, nurseListNames});
 
 
   } catch (error) {
@@ -518,7 +528,7 @@ export const resetPatient = async (req: Request, res: Response) => {
     await user.save();
     res.json({ message: `thank you ${user.name}, reseted successfully` });
   } catch (error) {
-    res.send("error degat" + error)
+    res.status(405).send("error degat" + error)
   }
 }
 
