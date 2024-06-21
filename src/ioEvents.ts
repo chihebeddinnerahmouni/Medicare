@@ -40,6 +40,17 @@ export const ioEvents = (io: Server, socket: Socket) => {
         }
     });
   
+  //user accept nurse
+  socket.on("i accept this nurse", (nurseName) => {
+    for (let [id, sockett] of io.sockets.sockets) {
+      const namedSocket = sockett as Socket;
+      if (namedSocket.name === nurseName.nurseName) {
+        io.to(sockett.id).emit("user accepted u", "user accepted u");
+        break;
+      }
+    }
+  });
+  
   //choose another nurse
   socket.on("choose another nurse", (nurseName) => {
     for (let [id, sockett] of io.sockets.sockets) {
