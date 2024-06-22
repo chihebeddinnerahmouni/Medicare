@@ -448,7 +448,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         nurseRate: nurse.averageRating,
         nurseLikes: 80, //
         nurseSpecialite: nurse.specialite,
-        patientClients: 90,//
+        patientClients: nurse.patientClients,
         price: pricee, //
       };
       nurseListNames.push(nurse.name)

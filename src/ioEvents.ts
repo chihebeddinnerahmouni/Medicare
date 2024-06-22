@@ -13,6 +13,9 @@ export const ioEvents = (io: Server, socket: Socket) => {
 
   //for sending requests to nurses
   socket.on("sendRequest", (userName, nurseNames, requestData): void => {
+    if (!nurseNames) {
+      return;
+    }
     const room = `request of ${userName}`;
     socket.join(room);
 
@@ -61,6 +64,45 @@ export const ioEvents = (io: Server, socket: Socket) => {
       }
     }
   });
+
+
+  //send request to choosen nurse
+  socket.on("send to choosen nurse", (data) => {
+    const choosenNurseName = data.choosenNurseName;
+    const requestData = data.requestData;
+    for (let [id, sockett] of io.sockets.sockets) {
+      const namedSocket = sockett as Socket;
+      if (namedSocket.name === choosenNurseName) {
+        io.to(sockett.id).emit("u are choosen", "u have recievd a new request", requestData);
+        break;
+      }
+    }
+  });
+
+  //accept custom request
+  socket.on("accept custom request", (patientName) => {
+    console.log(patientName);
+    for (let [id, sockett] of io.sockets.sockets) {
+      const namedSocket = sockett as Socket;
+      if (namedSocket.name === patientName) {
+        io.to(sockett.id).emit("custom request accepted");
+        break;
+      }
+    }
+  });
+
+  //refuse custom request
+  socket.on("refuse custom request", (patientName) => {
+    for (let [id, sockett] of io.sockets.sockets) {
+      const namedSocket = sockett as Socket;
+      if (namedSocket.name === patientName) {
+        io.to(sockett.id).emit("custom request refused");
+        break;
+      }
+    }
+  });
+
+
 
   //nurse end work
   socket.on("nurse end work", (patientName): void => { 
