@@ -8,13 +8,17 @@ import { signupDoctor } from "../controllers/doctor-controllers";
 import { signupPatient } from "../controllers/patient-controllers";
 import  authGuard  from "../middlewear/authGuard";
 import { logout } from "../middlewear/log-out";
-import  searchMedicalStaff  from "../middlewear/search-medical-staff";
+import searchMedicalStaff from "../middlewear/search-medical-staff";
+import { verifyToken } from "../middlewear/Verify-token";
 
 
 const router = express.Router();
 
 //walo
 router.get("/", (req, res) => { res.send("Welcome to the Health Care API") });
+
+//verify token
+router.get("/verify-token", authGuard, verifyToken);
 
 //signup nurse
 router.post("/signup-nurse", signupNurse);
@@ -42,5 +46,6 @@ router.post("/logout", authGuard, logout);
 
 //search for doctor and nurses
 router.get("/search",  searchMedicalStaff);
+
 
 module.exports = router;

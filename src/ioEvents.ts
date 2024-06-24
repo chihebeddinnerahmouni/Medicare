@@ -124,6 +124,5 @@ export const ioEvents = (io: Server, socket: Socket) => {
     socket.rooms.forEach((room) => {
       socket.leave(room);
     });
-    console.log("Client disconnected");
   });
 };
