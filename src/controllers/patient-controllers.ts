@@ -432,7 +432,7 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
             type: "Point",
             coordinates: userLocation,
           },
-          $maxDistance: 1000, //in meters
+          $maxDistance: 1000,
         },
       },
     });
@@ -440,16 +440,16 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         //
     let nurseList = [];
     let nurseListNames = [];
-    let pricee = 499;
+    let pricee = 499; // only for test...price will be calculated based on many dependencies
     for (let nurse of nearbyNurses) {
       pricee = pricee + 1;
       const nurseInfos = {
         nurseName: nurse.name,
         nurseRate: nurse.averageRating,
-        nurseLikes: 80, //
+        nurseLikes: 80, // only for test...
         nurseSpecialite: nurse.specialite,
         patientClients: nurse.patientClients,
-        price: pricee, //
+        price: pricee, // only for test...
       };
       nurseListNames.push(nurse.name)
       nurseList.push(nurseInfos);
@@ -462,11 +462,11 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
         nurse: nurse.name,
         status: "pending",
         nursesRequested: nurseListNames,
-        price: 500, //
+        price: 500, // only for test...
         service: service,
         subService: subService,
         patientRate: user.averageRating,
-        distance: 2.6, //
+        distance: 2.6, // only for test...
         choosen: false,
         location: {
           type: "Point",
@@ -495,8 +495,8 @@ export const getNearbyNurses = async (req: Request, res: Response) => {
     const requestData = {  
       service: service,
       subService: subService,
-      distance: 2.6, //
-      price: 500, //
+      distance: 2.6, // only for test...
+      price: 500, // only for test...
       patient: user.name,
       patientRate: user.averageRating,
       location: userLocation,

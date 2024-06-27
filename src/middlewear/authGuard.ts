@@ -6,7 +6,7 @@ dotenv.config();
 declare global {
   namespace Express {
     interface Request {
-      user: any; // or the actual type of your user
+      user: any;
     }
   }
 }
@@ -27,28 +27,13 @@ const authGuard = async (
         if (err.name === 'TokenExpiredError') return res.status(401).json({ message: 'token expires' });
         
         return res.status(401).json({ message: 'Invalid token', error: err });
-      } 
-
-        /*const id = payload.id;
-        const type = payload.type;
-        const tokenVersion = payload.tokenVersion;
-        const user = await findUserById(req, res, type, id);
-      
-        if (user.tokenVersion !== tokenVersion) {
-            user.online = false;
-            user.token = "";
-            user.tokenVersion += 1;
-          await user.save();
-          return res.status(401).json({ message: 'token version not matched and u r logged out' });
-        }*/
-      
-
+      }
         req.user = payload;
         next();
       
     });
   } catch (e) {
-    res.status(401).json({ message: 'error degat', error: e });
+    res.status(401).json({ message: 'error', error: e });
   }
 }
 

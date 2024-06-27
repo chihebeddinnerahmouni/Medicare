@@ -18,7 +18,7 @@ const sendinSignupEmail = async (
     const token = jwt.sign({ name: name, type: type }, process.env.secret_key as string);
     const verificationLink = `localhost:3000/verify?code=${token}`;
     const data = {
-      from: "hna <infos@medicares.me>",
+      from: "<infos@medicares.me>",
       to: email,
       subject: "Verification Code",
       text: `Your verification link is ${verificationLink}`,

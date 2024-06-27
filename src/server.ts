@@ -73,7 +73,8 @@ const io = new Server(server, {
 
 
 io.on("connection", (socket) => {
-  ioEvents(io, socket);
+  console.log("User connected");
+  ioEvents(io, socket); 
 });
 
 
